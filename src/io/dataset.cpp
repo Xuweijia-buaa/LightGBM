@@ -465,6 +465,43 @@ void PushDataToMultiValBin(
   Common::FunctionTimer fun_time("Dataset::PushDataToMultiValBin",
                                  global_timer);
   if (ret->IsSparse()) {
+    const int num_threads = OMP_NUM_THREADS();
+    std::vector<std::vector<std::vector<int>>> non_zero_features(num_threads);
+    Threading::For<int>(
+      0, static_cast<int>(most_freq_bins.size()), 1024, [&non_zero_features, num_data, iters, &most_freq_bins](int tid, int start, int end) {
+        std::vector<std::vector<int>>& thread_non_zero_features = non_zero_features[tid];
+        thread_non_zero_features.resize(num_data);
+        for (int feature_index = start; feature_index < end; ++feature_index) {
+          BinIterator* iter = (*iters)[0][feature_index].get();
+          const uint32_t most_freq_bin = most_freq_bins[feature_index];
+          data_size_t cur_pos = 0;
+          data_size_t i_delta = -1;
+          iter->InitIndex(0, &i_delta, &cur_pos);
+          iter->Reset(0);
+          do {
+            iter->NextNonZero(&i_delta, &cur_pos);
+            const uint32_t bin = iter->Get(cur_pos);
+            if (cur_pos < num_data && bin != most_freq_bin) {
+              thread_non_zero_features[cur_pos].push_back(feature_index);
+            }
+          } while (cur_pos < num_data);
+        }
+      });
+    Threading::For<data_size_t>(0, num_data, 1024, [&non_zero_features, num_threads] (int /*tid*/, data_size_t start, data_size_t end) {
+      for (data_size_t i = start; i < end; ++i) {
+        std::vector<int>& target = non_zero_features[0][i];
+        for (int thread_index = 1; thread_index < num_threads; ++thread_index) {
+          std::vector<int>& source = non_zero_features[thread_index][i];
+          for (size_t j = 0; j < source.size(); ++j) {
+            target.push_back(source[j]);
+          }
+          source.clear();
+          source.shrink_to_fit();
+        }
+      }
+    });
+    non_zero_features.resize(1);
+    non_zero_features.shrink_to_fit();
     Threading::For<data_size_t>(
         0, num_data, 1024, [&](int tid, data_size_t start, data_size_t end) {
           std::vector<uint32_t> cur_data;
@@ -474,14 +511,15 @@ void PushDataToMultiValBin(
           }
           for (data_size_t i = start; i < end; ++i) {
             cur_data.clear();
-            for (size_t j = 0; j < most_freq_bins.size(); ++j) {
+            for (size_t j = 0; j < non_zero_features[0][i].size(); ++j) {
               // for sparse multi value bin, we store the feature bin values with offset added
-              auto cur_bin = (*iters)[tid][j]->Get(i);
-              if (cur_bin == most_freq_bins[j]) {
+              const int feature_index = non_zero_features[0][i][j];
+              auto cur_bin = (*iters)[tid][feature_index]->Get(i);
+              if (cur_bin == most_freq_bins[feature_index]) {
                 continue;
               }
-              cur_bin += offsets[j];
-              if (most_freq_bins[j] == 0) {
+              cur_bin += offsets[feature_index];
+              if (most_freq_bins[feature_index] == 0) {
                 cur_bin -= 1;
               }
               cur_data.push_back(cur_bin);

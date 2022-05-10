@@ -274,6 +274,8 @@ class BinIterator {
   virtual uint32_t RawGet(data_size_t idx) = 0;
   virtual void Reset(data_size_t idx) = 0;
   virtual ~BinIterator() = default;
+  virtual void NextNonZero(data_size_t* i_delta, data_size_t* cur_pos) = 0;
+  virtual void InitIndex(data_size_t start_idx, data_size_t* i_delta, data_size_t* cur_pos) const = 0;
 };
 
 /*!

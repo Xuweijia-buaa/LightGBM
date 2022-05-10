@@ -59,6 +59,15 @@ class SparseBinIterator : public BinIterator {
 
   inline void Reset(data_size_t idx) override;
 
+  void InitIndex(data_size_t start_idx, data_size_t* i_delta,
+                 data_size_t* cur_pos) const override {
+    bin_data_->InitIndex(start_idx, i_delta, cur_pos);
+  }
+
+  void NextNonZero(data_size_t* i_delta, data_size_t* cur_pos) override {
+    bin_data_->NextNonzeroFast(i_delta, cur_pos);
+  }
+
  private:
   const SparseBin<VAL_T>* bin_data_;
   data_size_t cur_pos_;

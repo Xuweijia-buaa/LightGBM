@@ -37,6 +37,13 @@ class DenseBinIterator : public BinIterator {
   inline uint32_t RawGet(data_size_t idx) override;
   inline uint32_t Get(data_size_t idx) override;
   inline void Reset(data_size_t) override {}
+  void InitIndex(data_size_t start_idx, data_size_t* i_delta, data_size_t* cur_pos) const override {
+    *i_delta = start_idx - 1;
+    *cur_pos = start_idx;
+  }
+  void NextNonZero(data_size_t* i_delta, data_size_t* cur_pos) override {
+    *cur_pos = ++(*i_delta);
+  }
 
  private:
   const DenseBin<VAL_T, IS_4BIT>* bin_data_;
