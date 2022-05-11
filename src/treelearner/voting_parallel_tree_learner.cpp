@@ -283,18 +283,26 @@ void VotingParallelTreeLearner<TREELEARNER_T>::CopyLocalHistogram(const std::vec
           smaller_buffer_read_start_pos_[inner_feature_index] = static_cast<int>(cur_size);
         }
         // copy
-        std::memcpy(input_buffer_.data() + reduce_scatter_size_, this->smaller_leaf_histogram_array_[inner_feature_index].RawData(), this->smaller_leaf_histogram_array_[inner_feature_index].SizeOfHistgram());
         if (this->config_->use_discretized_grad) {
           if (smaller_leaf_num_bits <= 16) {
+            std::memcpy(input_buffer_.data() + reduce_scatter_size_,
+                    this->smaller_leaf_histogram_array_[inner_feature_index].RawDataInt16(),
+                    this->smaller_leaf_histogram_array_[inner_feature_index].SizeOfInt16Histgram());
             int size_to_add = this->smaller_leaf_histogram_array_[inner_feature_index].SizeOfInt16Histgram();
             cur_size += size_to_add;
             reduce_scatter_size_ += size_to_add;
           } else {
+            std::memcpy(input_buffer_.data() + reduce_scatter_size_,
+                    this->smaller_leaf_histogram_array_[inner_feature_index].RawDataInt32(),
+                    this->smaller_leaf_histogram_array_[inner_feature_index].SizeOfInt32Histgram());
             int size_to_add = this->smaller_leaf_histogram_array_[inner_feature_index].SizeOfInt32Histgram();
             cur_size += size_to_add;
             reduce_scatter_size_ += size_to_add;
           }
         } else {
+          std::memcpy(input_buffer_.data() + reduce_scatter_size_,
+                    this->smaller_leaf_histogram_array_[inner_feature_index].RawData(),
+                    this->smaller_leaf_histogram_array_[inner_feature_index].SizeOfHistgram());
           int size_to_add = this->smaller_leaf_histogram_array_[inner_feature_index].SizeOfHistgram();
           cur_size += size_to_add;
           reduce_scatter_size_ += size_to_add;
@@ -314,18 +322,26 @@ void VotingParallelTreeLearner<TREELEARNER_T>::CopyLocalHistogram(const std::vec
           larger_buffer_read_start_pos_[inner_feature_index] = static_cast<int>(cur_size);
         }
         // copy
-        std::memcpy(input_buffer_.data() + reduce_scatter_size_, this->larger_leaf_histogram_array_[inner_feature_index].RawData(), this->larger_leaf_histogram_array_[inner_feature_index].SizeOfHistgram());
         if (this->config_->use_discretized_grad) {
           if (larger_leaf_num_bits <= 16) {
+            std::memcpy(input_buffer_.data() + reduce_scatter_size_,
+                        this->larger_leaf_histogram_array_[inner_feature_index].RawDataInt16(),
+                        this->larger_leaf_histogram_array_[inner_feature_index].SizeOfInt16Histgram());
             int size_to_add = this->larger_leaf_histogram_array_[inner_feature_index].SizeOfInt16Histgram();
             cur_size += size_to_add;
             reduce_scatter_size_ += size_to_add;
           } else {
+            std::memcpy(input_buffer_.data() + reduce_scatter_size_,
+                        this->larger_leaf_histogram_array_[inner_feature_index].RawDataInt32(),
+                        this->larger_leaf_histogram_array_[inner_feature_index].SizeOfInt32Histgram());
             int size_to_add = this->larger_leaf_histogram_array_[inner_feature_index].SizeOfInt32Histgram();
             cur_size += size_to_add;
             reduce_scatter_size_ += size_to_add;
           }
         } else {
+          std::memcpy(input_buffer_.data() + reduce_scatter_size_,
+                        this->larger_leaf_histogram_array_[inner_feature_index].RawData(),
+                        this->larger_leaf_histogram_array_[inner_feature_index].SizeOfHistgram());
           int size_to_add = this->larger_leaf_histogram_array_[inner_feature_index].SizeOfHistgram();
           cur_size += size_to_add;
           reduce_scatter_size_ += size_to_add;
