@@ -468,7 +468,7 @@ void PushDataToMultiValBin(
     const int num_threads = OMP_NUM_THREADS();
     std::vector<std::vector<std::vector<int>>> non_zero_features(num_threads);
     Threading::For<int>(
-      0, static_cast<int>(most_freq_bins.size()), 1024, [&non_zero_features, num_data, iters, &most_freq_bins](int tid, int start, int end) {
+      0, static_cast<int>(most_freq_bins.size()), 1, [&non_zero_features, num_data, iters, &most_freq_bins](int tid, int start, int end) {
         std::vector<std::vector<int>>& thread_non_zero_features = non_zero_features[tid];
         thread_non_zero_features.resize(num_data);
         for (int feature_index = start; feature_index < end; ++feature_index) {
@@ -487,16 +487,20 @@ void PushDataToMultiValBin(
           } while (cur_pos < num_data);
         }
       });
-    Threading::For<data_size_t>(0, num_data, 1024, [&non_zero_features, num_threads] (int /*tid*/, data_size_t start, data_size_t end) {
+    CHECK_EQ(non_zero_features[0].size(), static_cast<size_t>(num_data));
+    Threading::For<data_size_t>(0, num_data, 1024, [&non_zero_features, num_threads, num_data] (int /*tid*/, data_size_t start, data_size_t end) {
       for (data_size_t i = start; i < end; ++i) {
         std::vector<int>& target = non_zero_features[0][i];
         for (int thread_index = 1; thread_index < num_threads; ++thread_index) {
-          std::vector<int>& source = non_zero_features[thread_index][i];
-          for (size_t j = 0; j < source.size(); ++j) {
-            target.push_back(source[j]);
+          if (non_zero_features[thread_index].size() > 0) {
+            CHECK_EQ(non_zero_features[thread_index].size(), static_cast<size_t>(num_data));
+            std::vector<int>& source = non_zero_features[thread_index][i];
+            for (size_t j = 0; j < source.size(); ++j) {
+              target.push_back(source[j]);
+            }
+            source.clear();
+            source.shrink_to_fit();
           }
-          source.clear();
-          source.shrink_to_fit();
         }
       }
     });
