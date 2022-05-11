@@ -71,10 +71,25 @@ void VotingParallelTreeLearner<TREELEARNER_T>::Init(const Dataset* train_data, b
   int num_total_bin = this->share_state_->num_hist_total_bin();
   smaller_leaf_histogram_data_.resize(num_total_bin * 2);
   larger_leaf_histogram_data_.resize(num_total_bin * 2);
+  if (this->config_->use_discretized_grad) {
+    smaller_leaf_histogram_data_int16_.resize(num_total_bin * 2);
+    larger_leaf_histogram_data_int16_.resize(num_total_bin * 2);
+  }
   HistogramPool::SetFeatureInfo<true, true>(train_data, this->config_, &feature_metas_);
   for (int j = 0; j < train_data->num_features(); ++j) {
-    smaller_leaf_histogram_array_global_[j].Init(smaller_leaf_histogram_data_.data() + offsets[j] * 2, &feature_metas_[j]);
-    larger_leaf_histogram_array_global_[j].Init(larger_leaf_histogram_data_.data() + offsets[j] * 2, &feature_metas_[j]);
+    if (this->config_->use_discretized_grad) {
+      smaller_leaf_histogram_array_global_[j].Init(
+        smaller_leaf_histogram_data_.data() + offsets[j] * 2,
+        smaller_leaf_histogram_data_int16_.data() + offsets[j] * 2,
+        &feature_metas_[j]);
+      larger_leaf_histogram_array_global_[j].Init(
+        larger_leaf_histogram_data_.data() + offsets[j] * 2,
+        larger_leaf_histogram_data_int16_.data() + offsets[j] * 2,
+        &feature_metas_[j]);
+    } else {
+      smaller_leaf_histogram_array_global_[j].Init(smaller_leaf_histogram_data_.data() + offsets[j] * 2, &feature_metas_[j]);
+      larger_leaf_histogram_array_global_[j].Init(larger_leaf_histogram_data_.data() + offsets[j] * 2, &feature_metas_[j]);
+    }
   }
 }
 
@@ -271,15 +286,18 @@ void VotingParallelTreeLearner<TREELEARNER_T>::CopyLocalHistogram(const std::vec
         std::memcpy(input_buffer_.data() + reduce_scatter_size_, this->smaller_leaf_histogram_array_[inner_feature_index].RawData(), this->smaller_leaf_histogram_array_[inner_feature_index].SizeOfHistgram());
         if (this->config_->use_discretized_grad) {
           if (smaller_leaf_num_bits <= 16) {
-            cur_size += this->smaller_leaf_histogram_array_[inner_feature_index].SizeOfInt16Histgram();
-            reduce_scatter_size_ += this->smaller_leaf_histogram_array_[inner_feature_index].SizeOfInt16Histgram();
+            int size_to_add = this->smaller_leaf_histogram_array_[inner_feature_index].SizeOfInt16Histgram();
+            cur_size += size_to_add;
+            reduce_scatter_size_ += size_to_add;
           } else {
-            cur_size += this->smaller_leaf_histogram_array_[inner_feature_index].SizeOfInt32Histgram();
-            reduce_scatter_size_ += this->smaller_leaf_histogram_array_[inner_feature_index].SizeOfInt32Histgram();
+            int size_to_add = this->smaller_leaf_histogram_array_[inner_feature_index].SizeOfInt32Histgram();
+            cur_size += size_to_add;
+            reduce_scatter_size_ += size_to_add;
           }
         } else {
-          cur_size += this->smaller_leaf_histogram_array_[inner_feature_index].SizeOfHistgram();
-          reduce_scatter_size_ += this->smaller_leaf_histogram_array_[inner_feature_index].SizeOfHistgram();
+          int size_to_add = this->smaller_leaf_histogram_array_[inner_feature_index].SizeOfHistgram();
+          cur_size += size_to_add;
+          reduce_scatter_size_ += size_to_add;
         }
         ++smaller_idx;
       }
@@ -299,15 +317,18 @@ void VotingParallelTreeLearner<TREELEARNER_T>::CopyLocalHistogram(const std::vec
         std::memcpy(input_buffer_.data() + reduce_scatter_size_, this->larger_leaf_histogram_array_[inner_feature_index].RawData(), this->larger_leaf_histogram_array_[inner_feature_index].SizeOfHistgram());
         if (this->config_->use_discretized_grad) {
           if (larger_leaf_num_bits <= 16) {
-            cur_size += this->larger_leaf_histogram_array_[inner_feature_index].SizeOfInt16Histgram();
-            reduce_scatter_size_ += this->larger_leaf_histogram_array_[inner_feature_index].SizeOfInt16Histgram();
+            int size_to_add = this->larger_leaf_histogram_array_[inner_feature_index].SizeOfInt16Histgram();
+            cur_size += size_to_add;
+            reduce_scatter_size_ += size_to_add;
           } else {
-            cur_size += this->larger_leaf_histogram_array_[inner_feature_index].SizeOfInt32Histgram();
-            reduce_scatter_size_ += this->larger_leaf_histogram_array_[inner_feature_index].SizeOfInt32Histgram();
+            int size_to_add = this->larger_leaf_histogram_array_[inner_feature_index].SizeOfInt32Histgram();
+            cur_size += size_to_add;
+            reduce_scatter_size_ += size_to_add;
           }
         } else {
-          cur_size += this->larger_leaf_histogram_array_[inner_feature_index].SizeOfHistgram();
-          reduce_scatter_size_ += this->larger_leaf_histogram_array_[inner_feature_index].SizeOfHistgram();
+          int size_to_add = this->larger_leaf_histogram_array_[inner_feature_index].SizeOfHistgram();
+          cur_size += size_to_add;
+          reduce_scatter_size_ += size_to_add;
         }
         ++larger_idx;
       }
@@ -342,6 +363,10 @@ void VotingParallelTreeLearner<TREELEARNER_T>::FindBestSplits(const Tree* tree) 
 
   const int smaller_leaf_index = this->smaller_leaf_splits_->leaf_index();
   const data_size_t local_data_on_smaller_leaf = this->data_partition_->leaf_count(smaller_leaf_index);
+  const uint8_t smaller_leaf_num_bits_bin = this->leaf_num_bits_in_histogram_bin_[this->smaller_leaf_splits_->leaf_index()];
+  const uint8_t larger_leaf_num_bits_bin = this->larger_leaf_splits_->leaf_index() >= 0 ?
+    this->leaf_num_bits_in_histogram_bin_[this->larger_leaf_splits_->leaf_index()] : 32;
+  const uint8_t smaller_leaf_num_bits_acc = this->leaf_num_bits_in_histogram_acc_[this->smaller_leaf_splits_->leaf_index()];
   if (local_data_on_smaller_leaf <= 0) {
     // clear histogram buffer before synchronizing
     // otherwise histogram contents from the previous iteration will be sent
@@ -353,8 +378,18 @@ void VotingParallelTreeLearner<TREELEARNER_T>::FindBestSplits(const Tree* tree) 
       const BinMapper* feature_bin_mapper = this->train_data_->FeatureBinMapper(feature_index);
       const int num_bin = feature_bin_mapper->num_bin();
       const int offset = static_cast<int>(feature_bin_mapper->GetMostFreqBin() == 0);
-      hist_t* hist_ptr = this->smaller_leaf_histogram_array_[feature_index].RawData();
-      std::memset(reinterpret_cast<void*>(hist_ptr), 0, (num_bin - offset) * kHistEntrySize);
+      if (this->config_->use_discretized_grad) {
+        if (smaller_leaf_num_bits_bin <= 16) {
+          int16_t* hist_ptr = this->smaller_leaf_histogram_array_[feature_index].RawDataInt16();
+          std::memset(reinterpret_cast<void*>(hist_ptr), 0, (num_bin - offset) * kInt16HistEntrySize);
+        } else {
+          int32_t* hist_ptr = this->smaller_leaf_histogram_array_[feature_index].RawDataInt32();
+          std::memset(reinterpret_cast<void*>(hist_ptr), 0, (num_bin - offset) * kInt32HistEntrySize);
+        }
+      } else {
+        hist_t* hist_ptr = this->smaller_leaf_histogram_array_[feature_index].RawData();
+        std::memset(reinterpret_cast<void*>(hist_ptr), 0, (num_bin - offset) * kHistEntrySize);
+      }
       OMP_LOOP_EX_END();
     }
     OMP_THROW_EX();
@@ -373,12 +408,41 @@ void VotingParallelTreeLearner<TREELEARNER_T>::FindBestSplits(const Tree* tree) 
           const BinMapper* feature_bin_mapper = this->train_data_->FeatureBinMapper(feature_index);
           const int num_bin = feature_bin_mapper->num_bin();
           const int offset = static_cast<int>(feature_bin_mapper->GetMostFreqBin() == 0);
-          hist_t* hist_ptr = this->larger_leaf_histogram_array_[feature_index].RawData();
-          std::memset(reinterpret_cast<void*>(hist_ptr), 0, (num_bin - offset) * kHistEntrySize);
+          if (this->config_->use_discretized_grad) {
+            if (larger_leaf_num_bits_bin <= 16) {
+              int16_t* hist_ptr = this->larger_leaf_histogram_array_[feature_index].RawDataInt16();
+              std::memset(reinterpret_cast<void*>(hist_ptr), 0, (num_bin - offset) * kInt16HistEntrySize);
+            } else {
+              int32_t* hist_ptr = this->larger_leaf_histogram_array_[feature_index].RawDataInt32();
+              std::memset(reinterpret_cast<void*>(hist_ptr), 0, (num_bin - offset) * kInt32HistEntrySize);
+            }
+          } else {
+            hist_t* hist_ptr = this->larger_leaf_histogram_array_[feature_index].RawData();
+            std::memset(reinterpret_cast<void*>(hist_ptr), 0, (num_bin - offset) * kHistEntrySize);
+          }
           OMP_LOOP_EX_END();
         }
         OMP_THROW_EX();
       }
+    }
+  }
+
+  if (use_subtract && this->config_->use_discretized_grad) {
+    const int parent_index = std::min(this->smaller_leaf_splits_->leaf_index(), this->larger_leaf_splits_->leaf_index());
+    const uint8_t parent_hist_bits = this->node_num_bits_in_histogram_bin_[parent_index];
+    const uint8_t larger_hist_bits = this->leaf_num_bits_in_histogram_bin_[this->larger_leaf_splits_->leaf_index()];
+    if (parent_hist_bits > 16 && larger_hist_bits <= 16) {
+      OMP_INIT_EX();
+      #pragma omp parallel for schedule(static) num_threads(this->share_state_->num_threads)
+      for (int feature_index = 0; feature_index < this->num_features_; ++feature_index) {
+        OMP_LOOP_EX_BEGIN();
+        if (!is_feature_used[feature_index]) {
+          continue;
+        }
+        this->larger_leaf_histogram_array_[feature_index].CopyToBuffer(this->change_hist_bits_buffer_[feature_index].data());
+        OMP_LOOP_EX_END();
+      }
+      OMP_THROW_EX();
     }
   }
 
@@ -393,9 +457,29 @@ void VotingParallelTreeLearner<TREELEARNER_T>::FindBestSplits(const Tree* tree) 
     OMP_LOOP_EX_BEGIN();
     if (!is_feature_used[feature_index]) { continue; }
     const int real_feature_index = this->train_data_->RealFeatureIndex(feature_index);
-    this->train_data_->FixHistogram(feature_index,
-      this->smaller_leaf_splits_->sum_gradients(), this->smaller_leaf_splits_->sum_hessians(),
-      this->smaller_leaf_histogram_array_[feature_index].RawData());
+    if (this->config_->use_discretized_grad) {
+      const int64_t int_sum_gradient_and_hessian = this->smaller_leaf_splits_->int_sum_gradients_and_hessians();
+      if (smaller_leaf_num_bits_acc <= 16) {
+        CHECK_LE(smaller_leaf_num_bits_bin, 16);
+        this->train_data_->template FixHistogramInt<int32_t, int32_t, 16, 16>(
+            feature_index, int_sum_gradient_and_hessian,
+            reinterpret_cast<hist_t*>(this->smaller_leaf_histogram_array_[feature_index].RawDataInt16()));
+      } else {
+        if (smaller_leaf_num_bits_bin <= 16) {
+          this->train_data_->template FixHistogramInt<int32_t, int64_t, 16, 32>(
+              feature_index, int_sum_gradient_and_hessian,
+              reinterpret_cast<hist_t*>(this->smaller_leaf_histogram_array_[feature_index].RawDataInt16()));
+        } else {
+          this->train_data_->template FixHistogramInt<int64_t, int64_t, 32, 32>(
+              feature_index, int_sum_gradient_and_hessian,
+              reinterpret_cast<hist_t*>(this->smaller_leaf_histogram_array_[feature_index].RawDataInt32()));
+        }
+      }
+    } else {
+      this->train_data_->FixHistogram(feature_index,
+        this->smaller_leaf_splits_->sum_gradients(), this->smaller_leaf_splits_->sum_hessians(),
+        this->smaller_leaf_histogram_array_[feature_index].RawData());
+    }
 
     this->ComputeBestSplitForFeature(
         this->smaller_leaf_histogram_array_, feature_index, real_feature_index,
@@ -407,10 +491,55 @@ void VotingParallelTreeLearner<TREELEARNER_T>::FindBestSplits(const Tree* tree) 
     if (this->larger_leaf_splits_ == nullptr || this->larger_leaf_splits_->leaf_index() < 0) { continue; }
 
     if (use_subtract) {
-      this->larger_leaf_histogram_array_[feature_index].Subtract(this->smaller_leaf_histogram_array_[feature_index]);
+      if (this->config_->use_discretized_grad) {
+        const int parent_index = std::min(this->smaller_leaf_splits_->leaf_index(), this->larger_leaf_splits_->leaf_index());
+        const uint8_t parent_hist_bits = this->node_num_bits_in_histogram_bin_[parent_index];
+        const uint8_t smaller_hist_bits = this->leaf_num_bits_in_histogram_bin_[this->smaller_leaf_splits_->leaf_index()];
+        const uint8_t larger_hist_bits = this->leaf_num_bits_in_histogram_bin_[this->larger_leaf_splits_->leaf_index()];
+        if (parent_hist_bits <= 16) {
+          CHECK_LE(smaller_hist_bits, 16);
+          CHECK_LE(larger_hist_bits, 16);
+          this->larger_leaf_histogram_array_[feature_index].template Subtract<true, int32_t, int32_t, int32_t, 16, 16, 16>(
+              this->smaller_leaf_histogram_array_[feature_index]);
+        } else if (larger_hist_bits <= 16) {
+          CHECK_LE(smaller_hist_bits, 16);
+          this->larger_leaf_histogram_array_[feature_index].template Subtract<true, int64_t, int32_t, int32_t, 32, 16, 16>(
+              this->smaller_leaf_histogram_array_[feature_index], this->change_hist_bits_buffer_[feature_index].data());
+        } else if (smaller_hist_bits <= 16) {
+          this->larger_leaf_histogram_array_[feature_index].template Subtract<true, int64_t, int32_t, int64_t, 32, 16, 32>(
+              this->smaller_leaf_histogram_array_[feature_index]);
+        } else {
+          this->larger_leaf_histogram_array_[feature_index].template Subtract<true, int64_t, int64_t, int64_t, 32, 32, 32>(
+              this->smaller_leaf_histogram_array_[feature_index]);
+        }
+      } else {
+        this->larger_leaf_histogram_array_[feature_index].Subtract(this->smaller_leaf_histogram_array_[feature_index]);
+      }
     } else {
-      this->train_data_->FixHistogram(feature_index, this->larger_leaf_splits_->sum_gradients(), this->larger_leaf_splits_->sum_hessians(),
-        this->larger_leaf_histogram_array_[feature_index].RawData());
+      if (this->config_->use_discretized_grad) {
+        const int64_t int_sum_gradient_and_hessian = this->larger_leaf_splits_->int_sum_gradients_and_hessians();
+        const uint8_t hist_bits_bin = this->leaf_num_bits_in_histogram_bin_[this->larger_leaf_splits_->leaf_index()];
+        const uint8_t hist_bits_acc = this->leaf_num_bits_in_histogram_acc_[this->larger_leaf_splits_->leaf_index()];
+        if (hist_bits_acc <= 16) {
+          CHECK_LE(hist_bits_bin, 16);
+          this->train_data_->template FixHistogramInt<int32_t, int32_t, 16, 16>(
+              feature_index, int_sum_gradient_and_hessian,
+              reinterpret_cast<hist_t*>(this->larger_leaf_histogram_array_[feature_index].RawDataInt16()));
+        } else {
+          if (hist_bits_bin <= 16) {
+            this->train_data_->template FixHistogramInt<int32_t, int64_t, 16, 32>(
+                feature_index, int_sum_gradient_and_hessian,
+                reinterpret_cast<hist_t*>(this->larger_leaf_histogram_array_[feature_index].RawDataInt16()));
+          } else {
+            this->train_data_->template FixHistogramInt<int64_t, int64_t, 32, 32>(
+                feature_index, int_sum_gradient_and_hessian,
+                reinterpret_cast<hist_t*>(this->larger_leaf_histogram_array_[feature_index].RawDataInt32()));
+          }
+        }
+      } else {
+        this->train_data_->FixHistogram(feature_index, this->larger_leaf_splits_->sum_gradients(), this->larger_leaf_splits_->sum_hessians(),
+          this->larger_leaf_histogram_array_[feature_index].RawData());
+      }
     }
     this->ComputeBestSplitForFeature(
         this->larger_leaf_histogram_array_, feature_index, real_feature_index,
@@ -469,20 +598,20 @@ void VotingParallelTreeLearner<TREELEARNER_T>::FindBestSplits(const Tree* tree) 
   const uint8_t larger_leaf_num_bits = this->larger_leaf_splits_->leaf_index() >= 0 ?
     this->leaf_num_bits_in_histogram_bin_[this->larger_leaf_splits_->leaf_index()] : 32;
   if (!this->config_->use_discretized_grad) {
-    Network::ReduceScatter<false, 0>(input_buffer_.data(), reduce_scatter_size_, sizeof(hist_t), block_start_.data(), block_len_.data(),
+    Network::ReduceScatter<false, -1>(input_buffer_.data(), reduce_scatter_size_, sizeof(hist_t), block_start_.data(), block_len_.data(),
                          output_buffer_.data(), static_cast<comm_size_t>(output_buffer_.size()), &HistogramSumReducer);
   } else {
     if (smaller_leaf_num_bits <= 16 && (larger_leaf_num_bits <= 16 || this->larger_leaf_splits_->leaf_index() < 0)) {
-      Network::ReduceScatter<true, 16>(input_buffer_.data(), reduce_scatter_size_, sizeof(hist_t), block_start_.data(), block_len_.data(),
+      Network::ReduceScatter<false, -1>(input_buffer_.data(), reduce_scatter_size_, sizeof(int16_t), block_start_.data(), block_len_.data(),
                          output_buffer_.data(), static_cast<comm_size_t>(output_buffer_.size()), &Int16HistogramSumReducer);
     } else if (smaller_leaf_num_bits <= 16 && larger_leaf_num_bits <= 32) {
-      Network::ReduceScatter<true, 16>(input_buffer_.data(), reduce_scatter_size_, sizeof(hist_t), block_start_.data(), block_len_.data(),
-                         output_buffer_.data(), static_cast<comm_size_t>(output_buffer_.size()), &Int16HistogramSumReducer); // TODO
-      Log::Fatal("TODO!!!");
+      Network::ReduceScatter<false, -1>(input_buffer_.data(), reduce_scatter_size_, sizeof(int_hist_t), block_start_.data(), block_len_.data(),
+                         output_buffer_.data(), static_cast<comm_size_t>(output_buffer_.size()), &IntMixHistogramSumReducer); // TODO
+      //Log::Fatal("TODO!!!");
     } else {
       CHECK_EQ(smaller_leaf_num_bits, 32);
       CHECK_EQ(larger_leaf_num_bits, 32);
-      Network::ReduceScatter<true, 32>(input_buffer_.data(), reduce_scatter_size_, sizeof(hist_t), block_start_.data(), block_len_.data(),
+      Network::ReduceScatter<false, -1>(input_buffer_.data(), reduce_scatter_size_, sizeof(int_hist_t), block_start_.data(), block_len_.data(),
                          output_buffer_.data(), static_cast<comm_size_t>(output_buffer_.size()), &Int32HistogramSumReducer);
     }
   }
@@ -673,6 +802,9 @@ void VotingParallelTreeLearner<TREELEARNER_T>::Split(Tree* tree, int best_Leaf, 
       best_split_info.left_sum_hessian,
       best_split_info.left_sum_gradient_and_hessian,
       best_split_info.left_output);
+  }
+  if (this->config_->use_discretized_grad) {
+    this->SetNumBitsInHistogramBin(*left_leaf, *right_leaf);
   }
 }
 

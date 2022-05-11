@@ -77,6 +77,17 @@ inline static void Int16HistogramSumReducer(const char* src, char* dst, int type
   }
 }
 
+inline static void IntMixHistogramSumReducer(const char* src, char* dst, int type_size, comm_size_t len) {
+  const int32_t* src_ptr = reinterpret_cast<const int32_t*>(src);
+  int32_t* dst_ptr = reinterpret_cast<int32_t*>(dst);
+  const size_t steps = len / type_size;
+  const int num_threads = OMP_NUM_THREADS();
+  #pragma omp parallel for schedule(static) num_threads(num_threads)
+  for (size_t i = 0; i < steps; ++i) {
+    dst_ptr[i] += src_ptr[i];
+  }
+}
+
 /*! \brief This class used to convert feature values into bin,
 *          and store some meta information for bin*/
 class BinMapper {
