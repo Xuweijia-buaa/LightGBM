@@ -56,7 +56,7 @@ const score_t kEpsilon = 1e-15f;
 const double kZeroThreshold = 1e-35f;
 
 
-typedef int32_t comm_size_t;
+typedef int64_t comm_size_t;
 
 using PredictFunction =
 std::function<void(const std::vector<std::pair<int, double>>&, double* output)>;
