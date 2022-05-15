@@ -309,6 +309,7 @@ void DataParallelTreeLearner<TREELEARNER_T>::FindBestSplits(const Tree* tree) {
 
 template <typename TREELEARNER_T>
 void DataParallelTreeLearner<TREELEARNER_T>::FindBestSplitsFromHistograms(const std::vector<int8_t>&, bool, const Tree* tree) {
+  global_timer.Start("DataParallelTreeLearner::FindBestSplitsFromHistograms step -1");
   std::vector<SplitInfo> smaller_bests_per_thread(this->share_state_->num_threads);
   std::vector<SplitInfo> larger_bests_per_thread(this->share_state_->num_threads);
   std::vector<int8_t> smaller_node_used_features =
@@ -319,6 +320,7 @@ void DataParallelTreeLearner<TREELEARNER_T>::FindBestSplitsFromHistograms(const 
   double larger_leaf_parent_output = this->GetParentOutput(tree, this->larger_leaf_splits_.get());
   const uint8_t smaller_leaf_num_bits_bin = this->leaf_num_bits_in_histogram_bin_[this->smaller_leaf_splits_->leaf_index()];
   const uint8_t smaller_leaf_num_bits_acc = this->leaf_num_bits_in_histogram_bin_[this->smaller_leaf_splits_->leaf_index()];
+  global_timer.Stop("DataParallelTreeLearner::FindBestSplitsFromHistograms step -1");
 
   global_timer.Start("DataParallelTreeLearner::FindBestSplitsFromHistograms step 0");
   if (this->larger_leaf_splits_ != nullptr && this->larger_leaf_splits_->leaf_index() >= 0) {
@@ -340,6 +342,7 @@ void DataParallelTreeLearner<TREELEARNER_T>::FindBestSplitsFromHistograms(const 
   }
   global_timer.Stop("DataParallelTreeLearner::FindBestSplitsFromHistograms step 0");
 
+  global_timer.Start("DataParallelTreeLearner::FindBestSplitsFromHistograms step 0.5");
   OMP_INIT_EX();
   #pragma omp parallel for schedule(static)
   for (int feature_index = 0; feature_index < this->num_features_; ++feature_index) {
@@ -445,6 +448,7 @@ void DataParallelTreeLearner<TREELEARNER_T>::FindBestSplitsFromHistograms(const 
     OMP_LOOP_EX_END();
   }
   OMP_THROW_EX();
+  global_timer.Stop("DataParallelTreeLearner::FindBestSplitsFromHistograms step 0.5");
 
   global_timer.Start("DataParallelTreeLearner::FindBestSplitsFromHistograms step 1");
   auto smaller_best_idx = ArrayArgs<SplitInfo>::ArgMax(smaller_bests_per_thread);
