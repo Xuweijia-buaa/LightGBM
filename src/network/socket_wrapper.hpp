@@ -91,8 +91,8 @@ inline int inet_pton(int af, const char *src, void *dst) {
 #define FREE(x) HeapFree(GetProcessHeap(), 0, (x))
 
 namespace SocketConfig {
-const int kSocketBufferSize = 100 * 1000;
-const int kMaxReceiveSize = 100 * 1000;
+const int kSocketBufferSize = 100 * 10000;
+const int kMaxReceiveSize = 100 * 10000;
 const int kNoDelay = 1;
 }
 
