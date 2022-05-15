@@ -344,6 +344,7 @@ void DataParallelTreeLearner<TREELEARNER_T>::FindBestSplitsFromHistograms(const 
     const int tid = omp_get_thread_num();
     const int real_feature_index = this->train_data_->RealFeatureIndex(feature_index);
     // restore global histograms from buffer
+    global_timer.Start("data parallel find best splits step 0");
     if (this->config_->use_discretized_grad) {
       if (smaller_leaf_num_bits_bin <= 16) {
         this->smaller_leaf_histogram_array_[feature_index].FromMemoryInt16(
@@ -356,7 +357,9 @@ void DataParallelTreeLearner<TREELEARNER_T>::FindBestSplitsFromHistograms(const 
       this->smaller_leaf_histogram_array_[feature_index].FromMemory(
         output_buffer_.data() + buffer_read_start_pos_[feature_index]);
     }
+    global_timer.Stop("data parallel find best splits step 0");
 
+    global_timer.Start("data parallel find best splits step 1");
     if (this->config_->use_discretized_grad) {
       const int64_t int_sum_gradient_and_hessian = this->smaller_leaf_splits_->int_sum_gradients_and_hessians();
       if (smaller_leaf_num_bits_acc <= 16) {
@@ -383,7 +386,9 @@ void DataParallelTreeLearner<TREELEARNER_T>::FindBestSplitsFromHistograms(const 
                                       this->smaller_leaf_splits_->sum_gradients(), this->smaller_leaf_splits_->sum_hessians(),
                                       this->smaller_leaf_histogram_array_[feature_index].RawData());
     }
+    global_timer.Stop("data parallel find best splits step 1");
 
+    global_timer.Start("data parallel find best splits step 2");
     this->ComputeBestSplitForFeature(
         this->smaller_leaf_histogram_array_, feature_index, real_feature_index,
         smaller_node_used_features[feature_index],
@@ -392,9 +397,11 @@ void DataParallelTreeLearner<TREELEARNER_T>::FindBestSplitsFromHistograms(const 
         &smaller_bests_per_thread[tid],
         smaller_leaf_parent_output);
 
+    global_timer.Stop("data parallel find best splits step 2");
     // only root leaf
     if (this->larger_leaf_splits_ == nullptr || this->larger_leaf_splits_->leaf_index() < 0) continue;
 
+    global_timer.Start("data parallel find best splits step 3");
     // construct histgroms for large leaf, we init larger leaf as the parent, so we can just subtract the smaller leaf's histograms
     if (this->config_->use_discretized_grad) {
       const int parent_index = std::min(this->smaller_leaf_splits_->leaf_index(), this->larger_leaf_splits_->leaf_index());
@@ -420,7 +427,9 @@ void DataParallelTreeLearner<TREELEARNER_T>::FindBestSplitsFromHistograms(const 
       this->larger_leaf_histogram_array_[feature_index].Subtract(
         this->smaller_leaf_histogram_array_[feature_index]);
     }
+    global_timer.Stop("data parallel find best splits step 3");
 
+    global_timer.Start("data parallel find best splits step 4");
     this->ComputeBestSplitForFeature(
         this->larger_leaf_histogram_array_, feature_index, real_feature_index,
         larger_node_used_features[feature_index],
@@ -428,6 +437,7 @@ void DataParallelTreeLearner<TREELEARNER_T>::FindBestSplitsFromHistograms(const 
         this->larger_leaf_splits_.get(),
         &larger_bests_per_thread[tid],
         larger_leaf_parent_output);
+    global_timer.Stop("data parallel find best splits step 4");
     OMP_LOOP_EX_END();
   }
   OMP_THROW_EX();
