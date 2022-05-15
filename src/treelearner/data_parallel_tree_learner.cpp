@@ -300,8 +300,10 @@ void DataParallelTreeLearner<TREELEARNER_T>::FindBestSplits(const Tree* tree) {
   global_timer.Stop("DataParallelTreeLearner::ReduceHistogram::ReduceScatter");
   //Log::Warning("After reduce scatter");
   global_timer.Stop("DataParallelTreeLearner::ReduceHistogram");
+  global_timer.Start("DataParallelTreeLearner::FindBestSplitsFromHistograms");
   this->FindBestSplitsFromHistograms(
       this->col_sampler_.is_feature_used_bytree(), true, tree);
+  global_timer.Stop("DataParallelTreeLearner::FindBestSplitsFromHistograms");
   //Log::Warning("After find best splits");
 }
 
