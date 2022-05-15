@@ -318,6 +318,7 @@ void DataParallelTreeLearner<TREELEARNER_T>::FindBestSplitsFromHistograms(const 
   const uint8_t smaller_leaf_num_bits_bin = this->leaf_num_bits_in_histogram_bin_[this->smaller_leaf_splits_->leaf_index()];
   const uint8_t smaller_leaf_num_bits_acc = this->leaf_num_bits_in_histogram_bin_[this->smaller_leaf_splits_->leaf_index()];
 
+  global_timer.Start("DataParallelTreeLearner::FindBestSplitsFromHistograms step 0");
   if (this->larger_leaf_splits_ != nullptr && this->larger_leaf_splits_->leaf_index() >= 0) {
     const int parent_index = std::min(this->smaller_leaf_splits_->leaf_index(), this->larger_leaf_splits_->leaf_index());
     const uint8_t parent_num_bits = this->node_num_bits_in_histogram_bin_[parent_index];
@@ -335,6 +336,7 @@ void DataParallelTreeLearner<TREELEARNER_T>::FindBestSplitsFromHistograms(const 
       OMP_THROW_EX();
     }
   }
+  global_timer.Stop("DataParallelTreeLearner::FindBestSplitsFromHistograms step 0");
 
   OMP_INIT_EX();
   #pragma omp parallel for schedule(static)
@@ -442,6 +444,7 @@ void DataParallelTreeLearner<TREELEARNER_T>::FindBestSplitsFromHistograms(const 
   }
   OMP_THROW_EX();
 
+  global_timer.Start("DataParallelTreeLearner::FindBestSplitsFromHistograms step 1");
   auto smaller_best_idx = ArrayArgs<SplitInfo>::ArgMax(smaller_bests_per_thread);
   int leaf = this->smaller_leaf_splits_->leaf_index();
   this->best_split_per_leaf_[leaf] = smaller_bests_per_thread[smaller_best_idx];
@@ -451,7 +454,9 @@ void DataParallelTreeLearner<TREELEARNER_T>::FindBestSplitsFromHistograms(const 
     auto larger_best_idx = ArrayArgs<SplitInfo>::ArgMax(larger_bests_per_thread);
     this->best_split_per_leaf_[leaf] = larger_bests_per_thread[larger_best_idx];
   }
+  global_timer.Stop("DataParallelTreeLearner::FindBestSplitsFromHistograms step 1");
 
+  global_timer.Start("DataParallelTreeLearner::FindBestSplitsFromHistograms step 2");
   SplitInfo smaller_best_split, larger_best_split;
   smaller_best_split = this->best_split_per_leaf_[this->smaller_leaf_splits_->leaf_index()];
   // find local best split for larger leaf
@@ -467,6 +472,7 @@ void DataParallelTreeLearner<TREELEARNER_T>::FindBestSplitsFromHistograms(const 
   if (this->larger_leaf_splits_->leaf_index() >= 0) {
     this->best_split_per_leaf_[this->larger_leaf_splits_->leaf_index()] = larger_best_split;
   }
+  global_timer.Stop("DataParallelTreeLearner::FindBestSplitsFromHistograms step 2");
 }
 
 template <typename TREELEARNER_T>
