@@ -395,7 +395,8 @@ bool SerialTreeLearner::BeforeFindBestSplit(const Tree* tree, int left_leaf, int
 
 void SerialTreeLearner::FindBestSplits(const Tree* tree) {
   std::vector<int8_t> is_feature_used(num_features_, 0);
-  #pragma omp parallel for schedule(static, 256) if (num_features_ >= 512)
+  int all_used_features = 0;
+  #pragma omp parallel for schedule(static, 256) if (num_features_ >= 512) reduction(+:all_used_features)
   for (int feature_index = 0; feature_index < num_features_; ++feature_index) {
     if (!col_sampler_.is_feature_used_bytree()[feature_index]) continue;
     if (parent_leaf_histogram_array_ != nullptr
@@ -403,8 +404,10 @@ void SerialTreeLearner::FindBestSplits(const Tree* tree) {
       smaller_leaf_histogram_array_[feature_index].set_is_splittable(false);
       continue;
     }
+    ++all_used_features;
     is_feature_used[feature_index] = 1;
   }
+  Log::Warning("all_used_features = %d", all_used_features);
   bool use_subtract = parent_leaf_histogram_array_ != nullptr;
 
 #ifdef USE_CUDA
