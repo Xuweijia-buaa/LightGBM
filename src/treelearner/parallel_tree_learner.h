@@ -115,6 +115,7 @@ class DataParallelTreeLearner: public TREELEARNER_T {
   comm_size_t reduce_scatter_size_int16_;
   /*! \brief Store global number of data in leaves  */
   std::vector<data_size_t> global_data_count_in_leaf_;
+  std::vector<std::vector<int>> feature_distribution_;
 };
 
 /*!

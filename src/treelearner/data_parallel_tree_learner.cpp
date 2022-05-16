@@ -124,14 +124,16 @@ template <typename TREELEARNER_T>
 void DataParallelTreeLearner<TREELEARNER_T>::BeforeTrain() {
   TREELEARNER_T::BeforeTrain();
   // generate feature partition for current tree
-  std::vector<std::vector<int>> feature_distribution(num_machines_, std::vector<int>());
+  feature_distribution_.clear();
+  feature_distribution_.resize(num_machines_);
+  //std::vector<std::vector<int>> feature_distribution(num_machines_, std::vector<int>());
   std::vector<int> num_bins_distributed(num_machines_, 0);
   for (int i = 0; i < this->train_data_->num_total_features(); ++i) {
     int inner_feature_index = this->train_data_->InnerFeatureIndex(i);
     if (inner_feature_index == -1) { continue; }
     if (this->col_sampler_.is_feature_used_bytree()[inner_feature_index]) {
       int cur_min_machine = static_cast<int>(ArrayArgs<int>::ArgMin(num_bins_distributed));
-      feature_distribution[cur_min_machine].push_back(inner_feature_index);
+      feature_distribution_[cur_min_machine].push_back(inner_feature_index);
       auto num_bin = this->train_data_->FeatureNumBin(inner_feature_index);
       if (this->train_data_->FeatureBinMapper(inner_feature_index)->GetMostFreqBin() == 0) {
         num_bin -= 1;
@@ -141,18 +143,18 @@ void DataParallelTreeLearner<TREELEARNER_T>::BeforeTrain() {
     is_feature_aggregated_[inner_feature_index] = false;
   }
   // get local used feature
-  for (auto fid : feature_distribution[rank_]) {
+  for (auto fid : feature_distribution_[rank_]) {
     is_feature_aggregated_[fid] = true;
   }
 
   // get block start and block len for reduce scatter
   if (this->config_->use_discretized_grad) {
-    PrepareBufferPos(feature_distribution, &block_start_, &block_len_, &buffer_write_start_pos_,
+    PrepareBufferPos(feature_distribution_, &block_start_, &block_len_, &buffer_write_start_pos_,
       &buffer_read_start_pos_, &reduce_scatter_size_, kInt32HistEntrySize);
-    PrepareBufferPos(feature_distribution, &block_start_int16_, &block_len_int16_, &buffer_write_start_pos_int16_,
+    PrepareBufferPos(feature_distribution_, &block_start_int16_, &block_len_int16_, &buffer_write_start_pos_int16_,
       &buffer_read_start_pos_int16_, &reduce_scatter_size_int16_, kInt16HistEntrySize);
   } else {
-    PrepareBufferPos(feature_distribution, &block_start_, &block_len_, &buffer_write_start_pos_,
+    PrepareBufferPos(feature_distribution_, &block_start_, &block_len_, &buffer_write_start_pos_,
       &buffer_read_start_pos_, &reduce_scatter_size_, kHistEntrySize);
   }
 
@@ -343,11 +345,16 @@ void DataParallelTreeLearner<TREELEARNER_T>::FindBestSplitsFromHistograms(const 
   global_timer.Stop("DataParallelTreeLearner::FindBestSplitsFromHistograms step 0");
 
   global_timer.Start("DataParallelTreeLearner::FindBestSplitsFromHistograms step 0.5");
+  const int num_threads = OMP_NUM_THREADS();
+  Log::Warning("num_threads = %d", num_threads);
+  Log::Warning("omp_get_num_threads() = %d", omp_get_num_threads());
+  const int num_features_in_machine = static_cast<int>(feature_distribution_[rank_].size());
   OMP_INIT_EX();
   #pragma omp parallel for schedule(static)
-  for (int feature_index = 0; feature_index < this->num_features_; ++feature_index) {
+  for (int i = 0; i < num_features_in_machine; ++i) {
     OMP_LOOP_EX_BEGIN();
-    if (!is_feature_aggregated_[feature_index]) continue;
+    //if (!is_feature_aggregated_[feature_index]) continue;
+    const int feature_index = feature_distribution_[rank_][i];
     const int tid = omp_get_thread_num();
     const int real_feature_index = this->train_data_->RealFeatureIndex(feature_index);
     // restore global histograms from buffer
