@@ -357,11 +357,9 @@ void DataParallelTreeLearner<TREELEARNER_T>::FindBestSplitsFromHistograms(const 
 
   global_timer.Start("DataParallelTreeLearner::FindBestSplitsFromHistograms step 0.5");
   const int num_threads = OMP_NUM_THREADS();
-  Log::Warning("num_threads = %d", num_threads);
-  Log::Warning("omp_get_num_threads() = %d", omp_get_num_threads());
   const int num_features_in_machine = static_cast<int>(feature_distribution_[rank_].size());
   OMP_INIT_EX();
-  #pragma omp parallel for schedule(static)
+  #pragma omp parallel for schedule(static) num_threads(num_threads)
   for (int i = 0; i < num_features_in_machine; ++i) {
     OMP_LOOP_EX_BEGIN();
     //if (!is_feature_aggregated_[feature_index]) continue;
