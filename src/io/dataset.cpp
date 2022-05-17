@@ -480,9 +480,11 @@ void PushDataToMultiValBin(
           iter->Reset(0);
           do {
             iter->NextNonZero(&i_delta, &cur_pos);
-            const uint32_t bin = iter->Get(cur_pos);
-            if (cur_pos < num_data && bin != most_freq_bin) {
-              thread_non_zero_features[cur_pos].push_back(feature_index);
+            if (cur_pos < num_data) {
+              const uint32_t bin = iter->Get(cur_pos);
+              if (bin != most_freq_bin) {
+                thread_non_zero_features[cur_pos].push_back(feature_index);
+              }
             }
           } while (cur_pos < num_data);
         }
