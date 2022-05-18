@@ -87,7 +87,8 @@ class DataParallelTreeLearner: public TREELEARNER_T {
     std::vector<comm_size_t>* buffer_write_start_pos,
     std::vector<comm_size_t>* buffer_read_start_pos,
     comm_size_t* reduce_scatter_size,
-    size_t hist_entry_size);
+    size_t hist_entry_size,
+    const std::vector<size_t>& machine_used_features);
 
  private:
   /*! \brief Rank of local machine */
@@ -129,6 +130,7 @@ class DataParallelTreeLearner: public TREELEARNER_T {
   std::vector<std::vector<int>> thread_used_features_in_node_;
   std::vector<int> used_features_in_node_machine_;
   std::vector<std::vector<int>> thread_used_features_in_node_machine_;
+  std::vector<int8_t> is_feature_used_;
 };
 
 /*!

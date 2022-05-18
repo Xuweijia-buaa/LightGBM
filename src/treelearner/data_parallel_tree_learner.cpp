@@ -141,19 +141,23 @@ void DataParallelTreeLearner<TREELEARNER_T>::PrepareBufferPosNode(
   std::vector<comm_size_t>* buffer_write_start_pos,
   std::vector<comm_size_t>* buffer_read_start_pos,
   comm_size_t* reduce_scatter_size,
-  size_t hist_entry_size) {
+  size_t hist_entry_size,
+  const std::vector<size_t>& machine_used_features) {
   *reduce_scatter_size = 0;
   for (int i = 0; i < num_machines_; ++i) {
     (*block_len)[i] = 0;
-    for (auto fid : used_features_in_node_) {
-      if (is_feature_aggregated_all_[i][fid]) {
-        auto num_bin = this->train_data_->FeatureNumBin(fid);
-        if (this->train_data_->FeatureBinMapper(fid)->GetMostFreqBin() == 0) {
-          num_bin -= 1;
-        }
-        (*block_len)[i] += num_bin * hist_entry_size;
+    size_t start = machine_used_features[i];
+    size_t end = machine_used_features[i + 1];
+    //for (auto fid : used_features_in_node_) {
+    for (size_t j = start; j < end; ++j) {
+      const int fid = used_features_in_node_[j];
+      auto num_bin = this->train_data_->FeatureNumBin(fid);
+      if (this->train_data_->FeatureBinMapper(fid)->GetMostFreqBin() == 0) {
+        num_bin -= 1;
       }
+      (*block_len)[i] += num_bin * hist_entry_size;
     }
+    //}
     *reduce_scatter_size += (*block_len)[i];
   }
 
@@ -165,16 +169,21 @@ void DataParallelTreeLearner<TREELEARNER_T>::PrepareBufferPosNode(
   // get buffer_write_start_pos
   int bin_size = 0;
   for (int i = 0; i < num_machines_; ++i) {
-    for (auto fid : used_features_in_node_) {
-      if (is_feature_aggregated_all_[i][fid]) {
-        (*buffer_write_start_pos)[fid] = bin_size;
-        auto num_bin = this->train_data_->FeatureNumBin(fid);
-        if (this->train_data_->FeatureBinMapper(fid)->GetMostFreqBin() == 0) {
-          num_bin -= 1;
-        }
-        bin_size += num_bin * hist_entry_size;
+    size_t start = machine_used_features[i];
+    size_t end = machine_used_features[i + 1];
+    //for (auto fid : used_features_in_node_) {
+     // if (is_feature_aggregated_all_[i][fid]) {
+    for (size_t j = start; j < end; ++j) {
+      const int fid = used_features_in_node_[j];
+      (*buffer_write_start_pos)[fid] = bin_size;
+      auto num_bin = this->train_data_->FeatureNumBin(fid);
+      if (this->train_data_->FeatureBinMapper(fid)->GetMostFreqBin() == 0) {
+        num_bin -= 1;
       }
+      bin_size += num_bin * hist_entry_size;
     }
+     // }
+    //}
   }
 
   // get buffer_read_start_pos
@@ -302,8 +311,13 @@ void DataParallelTreeLearner<TREELEARNER_T>::BeforeTrain() {
 template <typename TREELEARNER_T>
 void DataParallelTreeLearner<TREELEARNER_T>::FindBestSplits(const Tree* tree) {
   global_timer.Start("DataParallelTreeLearner::FindBestSplits");
-  std::vector<int8_t> is_feature_used(this->num_features_, 0);
+  global_timer.Start("DataParallelTreeLearner::FindBestSplits step 0");
+  is_feature_used_.resize(this->num_features_, 0);
   const int num_threads = OMP_NUM_THREADS();
+  #pragma omp parallel for schedule(static) num_threads(num_threads)
+  for (int feature_index = 0; feature_index < this->num_features_; ++feature_index) {
+    is_feature_used_[feature_index] = 0;
+  }
   #pragma omp parallel for schedule(static) num_threads(num_threads)
   for (int thread_index = 0; thread_index < num_threads; ++thread_index) {
     thread_used_features_in_node_[thread_index].clear();
@@ -322,6 +336,8 @@ void DataParallelTreeLearner<TREELEARNER_T>::FindBestSplits(const Tree* tree) {
     }
     thread_used_features_in_node_machine_[tid].push_back(feature_index);
   }
+  global_timer.Stop("DataParallelTreeLearner::FindBestSplits step 0");
+  global_timer.Start("DataParallelTreeLearner::FindBestSplits step 1");
   used_features_in_node_machine_.clear();
   for (int thread_index = 0; thread_index < num_threads; ++thread_index) {
     for (size_t i = 0; i < thread_used_features_in_node_machine_[thread_index].size(); ++i) {
@@ -338,21 +354,45 @@ void DataParallelTreeLearner<TREELEARNER_T>::FindBestSplits(const Tree* tree) {
     block_len[i] = block_start[i + 1] - block_start[i];
   }
   used_features_in_node_.resize(block_start.back() / sizeof(int));
+  machine_used_features.resize(num_machines_ + 1, 0);
+  for (int i = num_machines_; i > 0; --i) {
+    machine_used_features[i] = machine_used_features[i - 1];
+  }
+  machine_used_features[0] = 0;
+  for (int i = 0; i < num_machines_; ++i) {
+    machine_used_features[i + 1] += machine_used_features[i];
+  }
+  global_timer.Stop("DataParallelTreeLearner::FindBestSplits step 1");
+  
+  global_timer.Start("DataParallelTreeLearner::FindBestSplits step 2");
   Network::Allgather(reinterpret_cast<char*>(used_features_in_node_machine_.data()), block_start.data(), block_len.data(), reinterpret_cast<char*>(used_features_in_node_.data()), block_start.back());
-
+  const int num_used_features_in_node = static_cast<int>(used_features_in_node_.size());
+  #pragma omp parallel for schedule(static) num_threads(num_threads)
+  for (int i = 0; i < num_used_features_in_node; ++i) {
+    const int feature_index = used_features_in_node_[i];
+    is_feature_used_[feature_index] = 1;
+  }
+  global_timer.Stop("DataParallelTreeLearner::FindBestSplits step 2");
+  global_timer.Start("DataParallelTreeLearner::FindBestSplits step 3");
+  const uint8_t smaller_leaf_num_bits = this->leaf_num_bits_in_histogram_bin_[this->smaller_leaf_splits_->leaf_index()];
   if (this->config_->use_discretized_grad) {
-    PrepareBufferPosNode(&block_start_, &block_len_, &buffer_write_start_pos_,
-      &buffer_read_start_pos_, &reduce_scatter_size_, kInt32HistEntrySize);
-    PrepareBufferPosNode(&block_start_int16_, &block_len_int16_, &buffer_write_start_pos_int16_,
-      &buffer_read_start_pos_int16_, &reduce_scatter_size_int16_, kInt16HistEntrySize);
+    if (smaller_leaf_num_bits > 16) {
+      PrepareBufferPosNode(&block_start_, &block_len_, &buffer_write_start_pos_,
+        &buffer_read_start_pos_, &reduce_scatter_size_, kInt32HistEntrySize, machine_used_features);
+    } else {
+      PrepareBufferPosNode(&block_start_int16_, &block_len_int16_, &buffer_write_start_pos_int16_,
+        &buffer_read_start_pos_int16_, &reduce_scatter_size_int16_, kInt16HistEntrySize, machine_used_features);
+    }
   } else {
     PrepareBufferPosNode(&block_start_, &block_len_, &buffer_write_start_pos_,
-      &buffer_read_start_pos_, &reduce_scatter_size_, kHistEntrySize);
+      &buffer_read_start_pos_, &reduce_scatter_size_, kHistEntrySize, machine_used_features);
   }
+  global_timer.Stop("DataParallelTreeLearner::FindBestSplits step 3");
 
+  global_timer.Start("DataParallelTreeLearner::FindBestSplits step 4");
   const int num_used_features_in_nodes = static_cast<int>(used_features_in_node_.size());
   TREELEARNER_T::ConstructHistograms(
-      is_feature_used, true);
+      is_feature_used_, true);
   const int smaller_leaf_index = this->smaller_leaf_splits_->leaf_index();
   const data_size_t local_data_on_smaller_leaf = this->data_partition_->leaf_count(smaller_leaf_index);
   if (local_data_on_smaller_leaf <= 0) {
@@ -377,10 +417,10 @@ void DataParallelTreeLearner<TREELEARNER_T>::FindBestSplits(const Tree* tree) {
       }
     }
   }
+  global_timer.Stop("DataParallelTreeLearner::FindBestSplits step 4");
   // construct local histograms
   global_timer.Start("DataParallelTreeLearner::ReduceHistogram");
   global_timer.Start("DataParallelTreeLearner::ReduceHistogram::Copy");
-  const uint8_t smaller_leaf_num_bits = this->leaf_num_bits_in_histogram_bin_[this->smaller_leaf_splits_->leaf_index()];
   #pragma omp parallel for schedule(static)
   for (int i = 0; i < num_used_features_in_nodes; ++i) {
     const int feature_index = used_features_in_node_[i];
@@ -434,7 +474,7 @@ void DataParallelTreeLearner<TREELEARNER_T>::FindBestSplits(const Tree* tree) {
   global_timer.Stop("DataParallelTreeLearner::ReduceHistogram");
   global_timer.Start("DataParallelTreeLearner::FindBestSplitsFromHistograms");
   this->FindBestSplitsFromHistograms(
-      is_feature_used, true, tree);
+      is_feature_used_, true, tree);
   global_timer.Stop("DataParallelTreeLearner::FindBestSplitsFromHistograms");
   global_timer.Stop("DataParallelTreeLearner::FindBestSplits");
   //Log::Warning("After find best splits");
