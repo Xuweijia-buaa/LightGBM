@@ -256,6 +256,7 @@ void DataParallelTreeLearner<TREELEARNER_T>::FindBestSplits(const Tree* tree) {
     }
   }
   used_features_in_node_.clear();
+  used_features_in_node_machine_.clear();
   for (int thread_index = 0; thread_index < num_threads; ++thread_index) {
     for (size_t i = 0; i < thread_used_features_in_node_[thread_index].size(); ++i) {
       used_features_in_node_.push_back(thread_used_features_in_node_[thread_index][i]);
