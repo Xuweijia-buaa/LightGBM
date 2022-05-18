@@ -210,12 +210,16 @@ void DataParallelTreeLearner<TREELEARNER_T>::BeforeTrain() {
       num_bins_distributed[cur_min_machine] += num_bin;
     }
     is_feature_aggregated_[inner_feature_index] = false;
+    for (int rank = 0; rank < num_machines_; ++rank) {
+      is_feature_aggregated_all_[rank][inner_feature_index] = false;
+    }
   }
   // get local used feature
   for (auto fid : feature_distribution_[rank_]) {
     is_feature_aggregated_[fid] = true;
   }
   for (int machine_index = 0; machine_index < num_machines_; ++machine_index) {
+    std::sort(feature_distribution_[machine_index].begin(), feature_distribution_[machine_index].end());
     for (auto fid : feature_distribution_[machine_index]) {
       is_feature_aggregated_all_[machine_index][fid] = true;
     }
@@ -305,31 +309,36 @@ void DataParallelTreeLearner<TREELEARNER_T>::FindBestSplits(const Tree* tree) {
     thread_used_features_in_node_[thread_index].clear();
     thread_used_features_in_node_machine_[thread_index].clear();
   }
-  #pragma omp parallel for schedule(static, 256) if (this->num_features_ >= 512)
-  for (int feature_index = 0; feature_index < this->num_features_; ++feature_index) {
+  int num_features_in_machine = static_cast<int>(feature_distribution_[rank_].size());
+  #pragma omp parallel for schedule(static, 256) if (num_features_in_machine >= 512)
+  for (int i = 0; i < num_features_in_machine; ++i) {
     int tid = omp_get_thread_num();
+    const int feature_index = feature_distribution_[rank_][i];
     if (!this->col_sampler_.is_feature_used_bytree()[feature_index]) continue;
     if (this->parent_leaf_histogram_array_ != nullptr
         && !this->parent_leaf_histogram_array_[feature_index].is_splittable()) {
       this->smaller_leaf_histogram_array_[feature_index].set_is_splittable(false);
       continue;
     }
-    is_feature_used[feature_index] = 1;
-    thread_used_features_in_node_[tid].push_back(feature_index);
-    if (is_feature_aggregated_[feature_index]) {
-      thread_used_features_in_node_machine_[tid].push_back(feature_index);
-    }
+    thread_used_features_in_node_machine_[tid].push_back(feature_index);
   }
-  used_features_in_node_.clear();
   used_features_in_node_machine_.clear();
   for (int thread_index = 0; thread_index < num_threads; ++thread_index) {
-    for (size_t i = 0; i < thread_used_features_in_node_[thread_index].size(); ++i) {
-      used_features_in_node_.push_back(thread_used_features_in_node_[thread_index][i]);
-    }
     for (size_t i = 0; i < thread_used_features_in_node_machine_[thread_index].size(); ++i) {
       used_features_in_node_machine_.push_back(thread_used_features_in_node_machine_[thread_index][i]);
     }
   }
+  std::vector<size_t> machine_used_features = Network::GlobalArray(used_features_in_node_machine_.size());
+  std::vector<comm_size_t> block_start(num_machines_ + 1, 0);
+  std::vector<comm_size_t> block_len(num_machines_, 0);
+  for (int i = 1; i < num_machines_ + 1; ++i) {
+    block_start[i] = block_start[i - 1] + machine_used_features[i - 1] * sizeof(int);
+  }
+  for (int i = 0; i < num_machines_; ++i) {
+    block_len[i] = block_start[i + 1] - block_start[i];
+  }
+  used_features_in_node_.resize(block_start.back() / sizeof(int));
+  Network::Allgather(reinterpret_cast<char*>(used_features_in_node_machine_.data()), block_start.data(), block_len.data(), reinterpret_cast<char*>(used_features_in_node_.data()), block_start.back());
 
   if (this->config_->use_discretized_grad) {
     PrepareBufferPosNode(&block_start_, &block_len_, &buffer_write_start_pos_,
