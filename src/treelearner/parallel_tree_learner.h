@@ -81,6 +81,14 @@ class DataParallelTreeLearner: public TREELEARNER_T {
     comm_size_t* reduce_scatter_size,
     size_t hist_entry_size);
 
+  void PrepareBufferPosNode(
+    std::vector<comm_size_t>* block_start,
+    std::vector<comm_size_t>* block_len,
+    std::vector<comm_size_t>* buffer_write_start_pos,
+    std::vector<comm_size_t>* buffer_read_start_pos,
+    comm_size_t* reduce_scatter_size,
+    size_t hist_entry_size);
+
  private:
   /*! \brief Rank of local machine */
   int rank_;
@@ -93,6 +101,7 @@ class DataParallelTreeLearner: public TREELEARNER_T {
   /*! \brief different machines will aggregate histograms for different features,
        use this to mark local aggregate features*/
   std::vector<bool> is_feature_aggregated_;
+  std::vector<std::vector<bool>> is_feature_aggregated_all_;
   /*! \brief Block start index for reduce scatter */
   std::vector<comm_size_t> block_start_;
   /*! \brief Block size for reduce scatter */
