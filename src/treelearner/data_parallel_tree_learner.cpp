@@ -153,8 +153,8 @@ void DataParallelTreeLearner<TREELEARNER_T>::PrepareBufferPosNode(
         }
         (*block_len)[i] += num_bin * hist_entry_size;
       }
-      *reduce_scatter_size += (*block_len)[i];
     }
+    *reduce_scatter_size += (*block_len)[i];
   }
 
   (*block_start)[0] = 0;
