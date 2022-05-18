@@ -148,7 +148,6 @@ void DataParallelTreeLearner<TREELEARNER_T>::PrepareBufferPosNode(
     (*block_len)[i] = 0;
     size_t start = machine_used_features[i];
     size_t end = machine_used_features[i + 1];
-    //for (auto fid : used_features_in_node_) {
     for (size_t j = start; j < end; ++j) {
       const int fid = used_features_in_node_[j];
       auto num_bin = this->train_data_->FeatureNumBin(fid);
@@ -157,7 +156,6 @@ void DataParallelTreeLearner<TREELEARNER_T>::PrepareBufferPosNode(
       }
       (*block_len)[i] += num_bin * hist_entry_size;
     }
-    //}
     *reduce_scatter_size += (*block_len)[i];
   }
 
@@ -171,8 +169,6 @@ void DataParallelTreeLearner<TREELEARNER_T>::PrepareBufferPosNode(
   for (int i = 0; i < num_machines_; ++i) {
     size_t start = machine_used_features[i];
     size_t end = machine_used_features[i + 1];
-    //for (auto fid : used_features_in_node_) {
-     // if (is_feature_aggregated_all_[i][fid]) {
     for (size_t j = start; j < end; ++j) {
       const int fid = used_features_in_node_[j];
       (*buffer_write_start_pos)[fid] = bin_size;
@@ -182,8 +178,6 @@ void DataParallelTreeLearner<TREELEARNER_T>::PrepareBufferPosNode(
       }
       bin_size += num_bin * hist_entry_size;
     }
-     // }
-    //}
   }
 
   // get buffer_read_start_pos
@@ -324,7 +318,7 @@ void DataParallelTreeLearner<TREELEARNER_T>::FindBestSplits(const Tree* tree) {
     thread_used_features_in_node_machine_[thread_index].clear();
   }
   int num_features_in_machine = static_cast<int>(feature_distribution_[rank_].size());
-  #pragma omp parallel for schedule(static, 256) if (num_features_in_machine >= 512)
+  #pragma omp parallel for schedule(static, 256) if (num_features_in_machine >= 512) num_threads(num_threads)
   for (int i = 0; i < num_features_in_machine; ++i) {
     int tid = omp_get_thread_num();
     const int feature_index = feature_distribution_[rank_][i];
@@ -336,12 +330,21 @@ void DataParallelTreeLearner<TREELEARNER_T>::FindBestSplits(const Tree* tree) {
     }
     thread_used_features_in_node_machine_[tid].push_back(feature_index);
   }
+  std::vector<size_t> thread_write_offsets(num_threads + 1, 0);
+  for (int thread_index = 0; thread_index < num_threads; ++thread_index) {
+    thread_write_offsets[thread_index + 1] = thread_used_features_in_node_machine_[thread_index].size();
+  }
+  for (int thread_index = 0; thread_index < num_threads; ++thread_index) {
+    thread_write_offsets[thread_index + 1] += thread_write_offsets[thread_index];
+  }
   global_timer.Stop("DataParallelTreeLearner::FindBestSplits step 0");
   global_timer.Start("DataParallelTreeLearner::FindBestSplits step 1");
-  used_features_in_node_machine_.clear();
+  used_features_in_node_machine_.resize(thread_write_offsets.back());
+  #pragma omp parallel for schedule(static) num_threads(num_threads)
   for (int thread_index = 0; thread_index < num_threads; ++thread_index) {
+    const size_t offset = thread_write_offsets[thread_index];
     for (size_t i = 0; i < thread_used_features_in_node_machine_[thread_index].size(); ++i) {
-      used_features_in_node_machine_.push_back(thread_used_features_in_node_machine_[thread_index][i]);
+      used_features_in_node_machine_[offset + i] = thread_used_features_in_node_machine_[thread_index][i];
     }
   }
   std::vector<size_t> machine_used_features = Network::GlobalArray(used_features_in_node_machine_.size());
