@@ -316,6 +316,35 @@ std::vector<std::vector<int>> FastFeatureBundling(
     // Using std::swap for vector<bool> will cause the wrong result.
     std::swap(group_is_multi_val[i], group_is_multi_val[j]);
   }
+  if (Network::num_machines() > 1) {
+    int num_groups = Network::rank() == 0 ? static_cast<int>(features_in_group.size()) : 0;
+    num_groups = Network::GlobalSyncUpByMax(num_groups);
+    std::vector<int> num_features_in_group(num_groups, 0);
+    if (Network::rank() == 0) {
+      for (int i = 0; i < num_groups; ++i) {
+        num_features_in_group[i] = static_cast<int>(features_in_group[i].size());
+      }
+    }
+    num_features_in_group = Network::GlobalSum<int>(&num_features_in_group);
+    if (Network::rank() > 0) {
+      features_in_group.clear();
+      group_is_multi_val.clear();
+      features_in_group.resize(num_groups);
+      group_is_multi_val.resize(num_groups, 0);
+      for (int i = 0; i < num_groups; ++i) {
+        features_in_group[i].resize(num_features_in_group[i], 0);
+      }
+    }
+    for (int i = 0; i < num_groups; ++i) {
+      features_in_group[i] = Network::GlobalSum<int>(&features_in_group[i]);
+    }
+    group_is_multi_val = Network::GlobalSum<int8_t>(&group_is_multi_val);
+    for (size_t i = 0; i < group_is_multi_val.size(); ++i) {
+      if (group_is_multi_val[i] > 1) {
+        group_is_multi_val[i] = 1;
+      }
+    }
+  }
   *multi_val_group = group_is_multi_val;
   return features_in_group;
 }
