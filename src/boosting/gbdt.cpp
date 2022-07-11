@@ -445,7 +445,7 @@ bool GBDT::TrainOneIter(const score_t* gradients, const score_t* hessians) {
         for (int i = 0; i < bag_data_cnt_; ++i) {
           // TODO(shiyu1994): bagging is not supported, the copy operation should be done in GPU
           gradients_pointer_[offset + i] = grad[bag_data_indices_[i]];
-          gradients_pointer_[offset + i] = hess[bag_data_indices_[i]];
+          hessians_pointer_[offset + i] = hess[bag_data_indices_[i]];
         }
         grad = gradients_pointer_ + offset;
         hess = hessians_pointer_ + offset;

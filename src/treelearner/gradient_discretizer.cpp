@@ -48,7 +48,8 @@ void GradientDiscretizer::Init(const data_size_t num_data) {
 void GradientDiscretizer::DiscretizeGradients(
   const data_size_t num_data,
   const score_t* input_gradients,
-  const score_t* input_hessians) {
+  const score_t* input_hessians,
+  const bool /*prepare_8bit_gradients*/) {
   if (!boundary_locked_) {
     double max_gradient = std::fabs(input_gradients[0]);
     double max_hessian = std::fabs(input_hessians[0]);

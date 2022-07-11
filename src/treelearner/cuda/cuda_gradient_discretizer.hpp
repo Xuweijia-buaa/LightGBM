@@ -37,9 +37,12 @@ class CUDAGradientDiscretizer: public GradientDiscretizer {
   void DiscretizeGradients(
     const data_size_t num_data,
     const score_t* input_gradients,
-    const score_t* input_hessians) override;
+    const score_t* input_hessians,
+    const bool prepare_8bit_gradients) override;
 
   const int32_t* discretized_gradients_and_hessians() const override { return discretized_gradients_and_hessians_.RawData(); }
+
+  const int16_t* discretized_gradients_and_hessians_8bit() const override { return discretized_gradients_and_hessians_8bit_.RawData(); }
 
   const score_t* grad_scale() const override { return grad_max_block_buffer_.RawData(); }
 
@@ -47,6 +50,7 @@ class CUDAGradientDiscretizer: public GradientDiscretizer {
 
   void Init(const data_size_t num_data) override {
     discretized_gradients_and_hessians_.Resize(num_data);
+    discretized_gradients_and_hessians_8bit_.Resize(num_data);
     num_reduce_blocks_ = (num_data + CUDA_GRADIENT_DISCRETIZER_BLOCK_SIZE - 1) / CUDA_GRADIENT_DISCRETIZER_BLOCK_SIZE;
     grad_min_block_buffer_.Resize(num_reduce_blocks_);
     grad_max_block_buffer_.Resize(num_reduce_blocks_);
@@ -94,6 +98,7 @@ class CUDAGradientDiscretizer: public GradientDiscretizer {
 
  protected:
   mutable CUDAVector<int32_t> discretized_gradients_and_hessians_;
+  mutable CUDAVector<int16_t> discretized_gradients_and_hessians_8bit_;
   mutable CUDAVector<score_t> grad_min_block_buffer_;
   mutable CUDAVector<score_t> grad_max_block_buffer_;
   mutable CUDAVector<score_t> hess_min_block_buffer_;

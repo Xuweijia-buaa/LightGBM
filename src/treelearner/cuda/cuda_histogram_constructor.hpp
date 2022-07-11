@@ -68,7 +68,7 @@ class CUDAHistogramConstructor {
 
   void ResetConfig(const Config* config);
 
-  void BeforeTrain(const score_t* gradients, const score_t* hessians);
+  void BeforeTrain(const score_t* gradients, const score_t* hessians, const int8_t* cuda_8bit_gradients_and_hessians);
 
   const hist_t* cuda_hist() const { return cuda_hist_; }
 
@@ -77,6 +77,10 @@ class CUDAHistogramConstructor {
   hist_t* cuda_hist_pointer() { return cuda_hist_; }
 
   cudaStream_t cuda_stream() const { return cuda_stream_; }
+
+  void PrintHistMethodInfo() const {
+    Log::Warning("total_hist_construct_8bit_ / total_hist_construct_ = %d / %d", total_hist_construct_8bit_, total_hist_construct_);
+  }
 
  private:
   void InitFeatureMetaInfo(const Dataset* train_data, const std::vector<uint32_t>& feature_hist_offsets);
@@ -174,6 +178,8 @@ class CUDAHistogramConstructor {
   const score_t* cuda_gradients_;
   /*! \brief hessians on CUDA */
   const score_t* cuda_hessians_;
+  /*! \brief 8-bit gradients on CUDA */
+  const int8_t* cuda_8bit_gradients_and_hessians_;
 
   const int gpu_device_id_;
   const bool gpu_use_dp_;
@@ -183,6 +189,9 @@ class CUDAHistogramConstructor {
   int nccl_thread_index_;
 
   CUDAVector<hist_t> hist_buffer_for_num_bit_change_;
+
+  int total_hist_construct_ = 0;
+  int total_hist_construct_8bit_ = 0;
 };
 
 }  // namespace LightGBM

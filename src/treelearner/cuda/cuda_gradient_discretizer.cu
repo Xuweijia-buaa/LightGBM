@@ -82,6 +82,7 @@ __global__ void ReduceBlockMinMaxKernel(
   }
 }
 
+template <bool GEN_8BIT_PACKED_GRADIENTS>
 __global__ void DiscretizeGradientsKernel(
   const data_size_t num_data,
   const score_t* input_gradients,
@@ -93,29 +94,38 @@ __global__ void DiscretizeGradientsKernel(
   const score_t* gradient_random_values,
   const score_t* hessian_random_values,
   const int grad_discretize_bins,
-  int32_t* output_gradients_and_hessians) {
+  int32_t* output_gradients_and_hessians,
+  int16_t* output_gradients_and_hessians_8bit) {
   const int start = random_values_use_start[iter];
   const data_size_t index = static_cast<data_size_t>(threadIdx.x + blockIdx.x * blockDim.x);
   const score_t grad_scale = *grad_scale_ptr;
   const score_t hess_scale = *hess_scale_ptr;
   int16_t* output_gradients_and_hessians_ptr = reinterpret_cast<int16_t*>(output_gradients_and_hessians);
+  int8_t* output_gradients_and_hessians_8bit_ptr = reinterpret_cast<int8_t*>(output_gradients_and_hessians_8bit);
   if (index < num_data) {
     const data_size_t index_offset = (index + start) % num_data;
     const score_t gradient = input_gradients[index];
     const score_t hessian = input_hessians[index];
     const score_t gradient_random_value = gradient_random_values[index_offset];
     const score_t hessian_random_value = hessian_random_values[index_offset];
-    output_gradients_and_hessians_ptr[2 * index + 1] = gradient > 0.0f ?
+    const int16_t discretized_grad = gradient > 0.0f ?
       static_cast<int16_t>(gradient * grad_scale + gradient_random_value) :
       static_cast<int16_t>(gradient * grad_scale - gradient_random_value);
-    output_gradients_and_hessians_ptr[2 * index] = static_cast<int16_t>(hessian * hess_scale + hessian_random_value);
+    const int16_t discretized_hess = static_cast<int16_t>(hessian * hess_scale + hessian_random_value);
+    output_gradients_and_hessians_ptr[2 * index + 1] = discretized_grad;
+    output_gradients_and_hessians_ptr[2 * index] = discretized_hess;
+    if (GEN_8BIT_PACKED_GRADIENTS) {
+      output_gradients_and_hessians_8bit_ptr[2 * index + 1] = static_cast<int8_t>(discretized_grad);
+      output_gradients_and_hessians_8bit_ptr[2 * index] = static_cast<int8_t>(discretized_hess);
+    }
   }
 }
 
 void CUDAGradientDiscretizer::DiscretizeGradients(
   const data_size_t num_data,
   const score_t* input_gradients,
-  const score_t* input_hessians) {
+  const score_t* input_hessians,
+  const bool prepare_8bit_gradients) {
   ReduceMinMaxKernel<<<num_reduce_blocks_, CUDA_GRADIENT_DISCRETIZER_BLOCK_SIZE>>>(
     num_data, input_gradients, input_hessians,
     grad_min_block_buffer_.RawData(),
@@ -152,19 +162,27 @@ void CUDAGradientDiscretizer::DiscretizeGradients(
     CUDASUCCESS_OR_FATAL(cudaStreamSynchronize(cuda_stream));
     CUDASUCCESS_OR_FATAL(cudaStreamDestroy(cuda_stream));
   }
-  DiscretizeGradientsKernel<<<num_reduce_blocks_, CUDA_GRADIENT_DISCRETIZER_BLOCK_SIZE>>>(
-    num_data,
-    input_gradients,
-    input_hessians,
-    grad_min_block_buffer_.RawData(),
-    hess_min_block_buffer_.RawData(),
-    iter_,
-    random_values_use_start_.RawData(),
-    gradient_random_values_.RawData(),
-    hessian_random_values_.RawData(),
-    grad_discretize_bins_,
-    discretized_gradients_and_hessians_.RawData());
-    SynchronizeCUDADevice(__FILE__, __LINE__);
+
+  #define DiscretizeGradientsKernel_ARGS \
+    num_data, \
+    input_gradients, \
+    input_hessians, \
+    grad_min_block_buffer_.RawData(), \
+    hess_min_block_buffer_.RawData(), \
+    iter_, \
+    random_values_use_start_.RawData(), \
+    gradient_random_values_.RawData(), \
+    hessian_random_values_.RawData(), \
+    grad_discretize_bins_, \
+    discretized_gradients_and_hessians_.RawData(), \
+    discretized_gradients_and_hessians_8bit_.RawData() \
+
+  if (prepare_8bit_gradients) {
+    DiscretizeGradientsKernel<true><<<num_reduce_blocks_, CUDA_GRADIENT_DISCRETIZER_BLOCK_SIZE>>>(DiscretizeGradientsKernel_ARGS);
+  } else {
+    DiscretizeGradientsKernel<false><<<num_reduce_blocks_, CUDA_GRADIENT_DISCRETIZER_BLOCK_SIZE>>>(DiscretizeGradientsKernel_ARGS);
+  }
+  SynchronizeCUDADevice(__FILE__, __LINE__);
   ++iter_;
 }
 

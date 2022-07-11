@@ -42,6 +42,8 @@ CUDAHistogramConstructor::CUDAHistogramConstructor(
   cuda_need_fix_histogram_features_ = nullptr;
   cuda_need_fix_histogram_features_num_bin_aligned_ = nullptr;
   nccl_thread_index_ = -1;
+  total_hist_construct_ = 0;
+  total_hist_construct_8bit_ = 0;
 }
 
 CUDAHistogramConstructor::~CUDAHistogramConstructor() {
@@ -96,9 +98,10 @@ void CUDAHistogramConstructor::InitFeatureMetaInfo(const Dataset* train_data, co
   }
 }
 
-void CUDAHistogramConstructor::BeforeTrain(const score_t* gradients, const score_t* hessians) {
+void CUDAHistogramConstructor::BeforeTrain(const score_t* gradients, const score_t* hessians, const int8_t* cuda_8bit_gradients_and_hessians) {
   cuda_gradients_ = gradients;
   cuda_hessians_ = hessians;
+  cuda_8bit_gradients_and_hessians_ = cuda_8bit_gradients_and_hessians;
   SetCUDAMemory<hist_t>(cuda_hist_, 0, num_total_bin_ * 2 * num_leaves_, __FILE__, __LINE__);
 }
 

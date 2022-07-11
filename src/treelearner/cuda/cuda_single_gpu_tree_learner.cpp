@@ -126,9 +126,10 @@ void CUDASingleGPUTreeLearner::BeforeTrain() {
     cuda_data_partition_->use_bagging() ? cuda_data_partition_->cuda_data_indices() : nullptr;
   cuda_data_partition_->BeforeTrain();
   if (config_->use_discretized_grad) {
-    cuda_gradient_discretizer_->DiscretizeGradients(num_data_, gradients_, hessians_);
+    cuda_gradient_discretizer_->DiscretizeGradients(num_data_, gradients_, hessians_, true);
     cuda_histogram_constructor_->BeforeTrain(
-      reinterpret_cast<const score_t*>(cuda_gradient_discretizer_->discretized_gradients_and_hessians()), nullptr);
+      reinterpret_cast<const score_t*>(cuda_gradient_discretizer_->discretized_gradients_and_hessians()), nullptr,
+      reinterpret_cast<const int8_t*>(cuda_gradient_discretizer_->discretized_gradients_and_hessians_8bit()));
     cuda_smaller_leaf_splits_->InitValues(
       config_->lambda_l1,
       config_->lambda_l2,
@@ -141,7 +142,7 @@ void CUDASingleGPUTreeLearner::BeforeTrain() {
       cuda_gradient_discretizer_->grad_scale(),
       cuda_gradient_discretizer_->hess_scale());
   } else {
-    cuda_histogram_constructor_->BeforeTrain(gradients_, hessians_);
+    cuda_histogram_constructor_->BeforeTrain(gradients_, hessians_, nullptr);
     cuda_smaller_leaf_splits_->InitValues(
       config_->lambda_l1,
       config_->lambda_l2,
@@ -403,6 +404,7 @@ Tree* CUDASingleGPUTreeLearner::Train(const score_t* gradients,
     global_timer.Stop("CUDASingleGPUTreeLearner::RenewDiscretizedTreeLeaves", nccl_thread_index_);
   }
   tree->ToHost();
+  cuda_histogram_constructor_->PrintHistMethodInfo();
   return tree.release();
 }
 

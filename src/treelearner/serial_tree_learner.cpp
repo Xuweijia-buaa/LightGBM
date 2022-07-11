@@ -209,7 +209,7 @@ Tree* SerialTreeLearner::Train(const score_t* gradients, const score_t *hessians
   share_state_->num_threads = num_threads;
 
   if (config_->use_discretized_grad) {
-    gradient_discretizer_->DiscretizeGradients(num_data_, gradients_, hessians_);
+    gradient_discretizer_->DiscretizeGradients(num_data_, gradients_, hessians_, false);
   }
 
   // some initial works before training

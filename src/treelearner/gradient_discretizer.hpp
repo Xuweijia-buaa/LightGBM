@@ -27,10 +27,15 @@ class GradientDiscretizer {
   virtual void DiscretizeGradients(
     const data_size_t num_data,
     const score_t* input_gradients,
-    const score_t* input_hessians);
+    const score_t* input_hessians,
+    const bool prepare_8bit_gradients);
 
   virtual const int32_t* discretized_gradients_and_hessians() const {
     return reinterpret_cast<const int32_t*>(discretized_gradients_and_hessians_vector_.data());
+  }
+
+  virtual const int16_t* discretized_gradients_and_hessians_8bit() const {
+    return nullptr;
   }
 
   virtual const score_t* grad_scale() const {

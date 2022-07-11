@@ -218,6 +218,73 @@ __global__ void CUDAConstructDiscretizedHistogramDenseKernel(
   }
 }
 
+template <typename BIN_TYPE, int SHARED_HIST_SIZE, bool USE_16BIT_HIST>
+__global__ void CUDAConstructDiscretized8BitHistogramDenseKernel(
+  const CUDALeafSplitsStruct* smaller_leaf_splits,
+  const int16_t* cuda_gradients_and_hessians,
+  const BIN_TYPE* data,
+  const uint32_t* column_hist_offsets,
+  const uint32_t* column_hist_offsets_full,
+  const int* feature_partition_column_index_offsets,
+  const data_size_t num_data) {
+  const int dim_y = static_cast<int>(gridDim.y * blockDim.y);
+  const data_size_t num_data_in_smaller_leaf = smaller_leaf_splits->num_data_in_leaf;
+  const data_size_t num_data_per_thread = (num_data_in_smaller_leaf + dim_y - 1) / dim_y;
+  const data_size_t* data_indices_ref = smaller_leaf_splits->data_indices_in_leaf;
+  __shared__ int8_t shared_hist[SHARED_HIST_SIZE];
+  int16_t* shared_hist_packed = reinterpret_cast<int16_t*>(shared_hist);
+  const unsigned int num_threads_per_block = blockDim.x * blockDim.y;
+  const int partition_column_start = feature_partition_column_index_offsets[blockIdx.x];
+  const int partition_column_end = feature_partition_column_index_offsets[blockIdx.x + 1];
+  const BIN_TYPE* data_ptr = data + partition_column_start * num_data;
+  const int num_columns_in_partition = partition_column_end - partition_column_start;
+  const uint32_t partition_hist_start = column_hist_offsets_full[blockIdx.x];
+  const uint32_t partition_hist_end = column_hist_offsets_full[blockIdx.x + 1];
+  const uint32_t num_items_in_partition = (partition_hist_end - partition_hist_start);
+  const unsigned int thread_idx = threadIdx.x + threadIdx.y * blockDim.x;
+  for (unsigned int i = thread_idx; i < num_items_in_partition; i += num_threads_per_block) {
+    shared_hist_packed[i] = 0;
+  }
+  __syncthreads();
+  const unsigned int threadIdx_y = threadIdx.y;
+  const unsigned int blockIdx_y = blockIdx.y;
+  const data_size_t block_start = (blockIdx_y * blockDim.y) * num_data_per_thread;
+  const data_size_t* data_indices_ref_this_block = data_indices_ref + block_start;
+  data_size_t block_num_data = max(0, min(num_data_in_smaller_leaf - block_start, num_data_per_thread * static_cast<data_size_t>(blockDim.y)));
+  const data_size_t num_iteration_total = (block_num_data + blockDim.y - 1) / blockDim.y;
+  const data_size_t remainder = block_num_data % blockDim.y;
+  const data_size_t num_iteration_this = remainder == 0 ? num_iteration_total : num_iteration_total - static_cast<data_size_t>(threadIdx_y >= remainder);
+  data_size_t inner_data_index = static_cast<data_size_t>(threadIdx_y);
+  const int column_index = static_cast<int>(threadIdx.x) + partition_column_start;
+  if (threadIdx.x < static_cast<unsigned int>(num_columns_in_partition)) {
+    uint16_t* shared_hist_ptr = reinterpret_cast<uint16_t*>(shared_hist_packed) + (column_hist_offsets[column_index]);
+    for (data_size_t i = 0; i < num_iteration_this; ++i) {
+      const data_size_t data_index = data_indices_ref_this_block[inner_data_index];
+      const uint16_t grad_and_hess = static_cast<uint16_t>(cuda_gradients_and_hessians[data_index]);
+      const uint32_t bin = static_cast<uint32_t>(data_ptr[data_index * num_columns_in_partition + threadIdx.x]);
+      uint16_t* pos_ptr = shared_hist_ptr + bin;
+      atomicAdd(pos_ptr, grad_and_hess);
+      inner_data_index += blockDim.y;
+    }
+  }
+  __syncthreads();
+  if (USE_16BIT_HIST) {
+    int32_t* feature_histogram_ptr = reinterpret_cast<int32_t*>(smaller_leaf_splits->hist_in_leaf) + partition_hist_start;
+    for (unsigned int i = thread_idx; i < num_items_in_partition; i += num_threads_per_block) {
+      const int16_t packed_grad_hess = shared_hist_packed[i];
+      const int32_t packed_grad_hess_int32 = (static_cast<int32_t>(static_cast<int8_t>(packed_grad_hess >> 8)) << 16) | (static_cast<int32_t>(packed_grad_hess & 0x00ff));
+      atomicAdd_system(feature_histogram_ptr + i, packed_grad_hess_int32);
+    }
+  } else {
+    unsigned long long* feature_histogram_ptr = reinterpret_cast<unsigned long long*>(smaller_leaf_splits->hist_in_leaf) + partition_hist_start;
+    for (unsigned int i = thread_idx; i < num_items_in_partition; i += num_threads_per_block) {
+      const int16_t packed_grad_hess = shared_hist_packed[i];
+      const int64_t packed_grad_hess_int64 = (static_cast<int64_t>(static_cast<int8_t>(packed_grad_hess >> 8)) << 32) | (static_cast<int64_t>(packed_grad_hess & 0x00ff));
+      atomicAdd_system(feature_histogram_ptr + i, (unsigned long long)(packed_grad_hess_int64));
+    }
+  }
+}
+
 template <typename BIN_TYPE, typename DATA_PTR_TYPE, typename HIST_TYPE, int SHARED_HIST_SIZE>
 __global__ void CUDAConstructHistogramSparseKernel(
   const CUDALeafSplitsStruct* smaller_leaf_splits,
@@ -504,33 +571,71 @@ void CUDAHistogramConstructor::LaunchConstructDiscretizedHistogramKernel(
   dim3 block_dim(block_dim_x, block_dim_y);
   if (num_bits_in_histogram_bins <= 16) {
     if (!cuda_row_data_->is_sparse()) {
+      const int num_data_per_block = (num_data_in_smaller_leaf + grid_dim_y - 1) / grid_dim_y;
+      ++total_hist_construct_;
       if (cuda_row_data_->bit_type() == 8) {
-        CUDAConstructDiscretizedHistogramDenseKernel<uint8_t, SHARED_HIST_SIZE, true><<<grid_dim, block_dim, 0, cuda_stream_>>>(
-          cuda_smaller_leaf_splits,
-          reinterpret_cast<const int32_t*>(cuda_gradients_),
-          cuda_row_data_->cuda_data_uint8(),
-          cuda_row_data_->cuda_column_hist_offsets(),
-          cuda_row_data_->cuda_partition_hist_offsets(),
-          cuda_row_data_->cuda_feature_partition_column_index_offsets(),
-          num_data_);
+        if (num_data_per_block <= 255 / grad_discretized_bins_) {
+          ++total_hist_construct_8bit_;
+          CUDAConstructDiscretized8BitHistogramDenseKernel<uint8_t, SHARED_HIST_SIZE, true><<<grid_dim, block_dim, 0, cuda_stream_>>>(
+            cuda_smaller_leaf_splits,
+            reinterpret_cast<const int16_t*>(cuda_8bit_gradients_and_hessians_),
+            cuda_row_data_->cuda_data_uint8(),
+            cuda_row_data_->cuda_column_hist_offsets(),
+            cuda_row_data_->cuda_partition_hist_offsets(),
+            cuda_row_data_->cuda_feature_partition_column_index_offsets(),
+            num_data_);
+        } else {
+          CUDAConstructDiscretizedHistogramDenseKernel<uint8_t, SHARED_HIST_SIZE, true><<<grid_dim, block_dim, 0, cuda_stream_>>>(
+            cuda_smaller_leaf_splits,
+            reinterpret_cast<const int32_t*>(cuda_gradients_),
+            cuda_row_data_->cuda_data_uint8(),
+            cuda_row_data_->cuda_column_hist_offsets(),
+            cuda_row_data_->cuda_partition_hist_offsets(),
+            cuda_row_data_->cuda_feature_partition_column_index_offsets(),
+            num_data_);
+          }
       } else if (cuda_row_data_->bit_type() == 16) {
-        CUDAConstructDiscretizedHistogramDenseKernel<uint16_t, SHARED_HIST_SIZE, true><<<grid_dim, block_dim, 0, cuda_stream_>>>(
-          cuda_smaller_leaf_splits,
-          reinterpret_cast<const int32_t*>(cuda_gradients_),
-          cuda_row_data_->cuda_data_uint16(),
-          cuda_row_data_->cuda_column_hist_offsets(),
-          cuda_row_data_->cuda_partition_hist_offsets(),
-          cuda_row_data_->cuda_feature_partition_column_index_offsets(),
-          num_data_);
+        if (num_data_per_block <= 255 / grad_discretized_bins_) {
+          ++total_hist_construct_8bit_;
+          CUDAConstructDiscretized8BitHistogramDenseKernel<uint16_t, SHARED_HIST_SIZE, true><<<grid_dim, block_dim, 0, cuda_stream_>>>(
+            cuda_smaller_leaf_splits,
+            reinterpret_cast<const int16_t*>(cuda_8bit_gradients_and_hessians_),
+            cuda_row_data_->cuda_data_uint16(),
+            cuda_row_data_->cuda_column_hist_offsets(),
+            cuda_row_data_->cuda_partition_hist_offsets(),
+            cuda_row_data_->cuda_feature_partition_column_index_offsets(),
+            num_data_);
+        } else {
+          CUDAConstructDiscretizedHistogramDenseKernel<uint16_t, SHARED_HIST_SIZE, true><<<grid_dim, block_dim, 0, cuda_stream_>>>(
+            cuda_smaller_leaf_splits,
+            reinterpret_cast<const int32_t*>(cuda_gradients_),
+            cuda_row_data_->cuda_data_uint16(),
+            cuda_row_data_->cuda_column_hist_offsets(),
+            cuda_row_data_->cuda_partition_hist_offsets(),
+            cuda_row_data_->cuda_feature_partition_column_index_offsets(),
+            num_data_);
+        }
       } else if (cuda_row_data_->bit_type() == 32) {
-        CUDAConstructDiscretizedHistogramDenseKernel<uint32_t, SHARED_HIST_SIZE, true><<<grid_dim, block_dim, 0, cuda_stream_>>>(
-          cuda_smaller_leaf_splits,
-          reinterpret_cast<const int32_t*>(cuda_gradients_),
-          cuda_row_data_->cuda_data_uint32(),
-          cuda_row_data_->cuda_column_hist_offsets(),
-          cuda_row_data_->cuda_partition_hist_offsets(),
-          cuda_row_data_->cuda_feature_partition_column_index_offsets(),
-          num_data_);
+        if (num_data_per_block <= 255 / grad_discretized_bins_) {
+          ++total_hist_construct_8bit_;
+          CUDAConstructDiscretized8BitHistogramDenseKernel<uint32_t, SHARED_HIST_SIZE, true><<<grid_dim, block_dim, 0, cuda_stream_>>>(
+            cuda_smaller_leaf_splits,
+            reinterpret_cast<const int16_t*>(cuda_8bit_gradients_and_hessians_),
+            cuda_row_data_->cuda_data_uint32(),
+            cuda_row_data_->cuda_column_hist_offsets(),
+            cuda_row_data_->cuda_partition_hist_offsets(),
+            cuda_row_data_->cuda_feature_partition_column_index_offsets(),
+            num_data_);
+        } else {
+          CUDAConstructDiscretizedHistogramDenseKernel<uint32_t, SHARED_HIST_SIZE, true><<<grid_dim, block_dim, 0, cuda_stream_>>>(
+            cuda_smaller_leaf_splits,
+            reinterpret_cast<const int32_t*>(cuda_gradients_),
+            cuda_row_data_->cuda_data_uint32(),
+            cuda_row_data_->cuda_column_hist_offsets(),
+            cuda_row_data_->cuda_partition_hist_offsets(),
+            cuda_row_data_->cuda_feature_partition_column_index_offsets(),
+            num_data_);
+        }
       }
     } else {
       if (cuda_row_data_->bit_type() == 8) {
@@ -624,33 +729,71 @@ void CUDAHistogramConstructor::LaunchConstructDiscretizedHistogramKernel(
     }
   } else {
     if (!cuda_row_data_->is_sparse()) {
+      const int num_data_per_block = (num_data_in_smaller_leaf + grid_dim_y - 1) / grid_dim_y;
+      ++total_hist_construct_;
       if (cuda_row_data_->bit_type() == 8) {
-        CUDAConstructDiscretizedHistogramDenseKernel<uint8_t, SHARED_HIST_SIZE, false><<<grid_dim, block_dim, 0, cuda_stream_>>>(
-          cuda_smaller_leaf_splits,
-          reinterpret_cast<const int32_t*>(cuda_gradients_),
-          cuda_row_data_->cuda_data_uint8(),
-          cuda_row_data_->cuda_column_hist_offsets(),
-          cuda_row_data_->cuda_partition_hist_offsets(),
-          cuda_row_data_->cuda_feature_partition_column_index_offsets(),
-          num_data_);
+        if (num_data_per_block <= 255 / grad_discretized_bins_) {
+          ++total_hist_construct_8bit_;
+          CUDAConstructDiscretized8BitHistogramDenseKernel<uint8_t, SHARED_HIST_SIZE, false><<<grid_dim, block_dim, 0, cuda_stream_>>>(
+            cuda_smaller_leaf_splits,
+            reinterpret_cast<const int16_t*>(cuda_8bit_gradients_and_hessians_),
+            cuda_row_data_->cuda_data_uint8(),
+            cuda_row_data_->cuda_column_hist_offsets(),
+            cuda_row_data_->cuda_partition_hist_offsets(),
+            cuda_row_data_->cuda_feature_partition_column_index_offsets(),
+            num_data_);
+        } else {
+          CUDAConstructDiscretizedHistogramDenseKernel<uint8_t, SHARED_HIST_SIZE, false><<<grid_dim, block_dim, 0, cuda_stream_>>>(
+            cuda_smaller_leaf_splits,
+            reinterpret_cast<const int32_t*>(cuda_gradients_),
+            cuda_row_data_->cuda_data_uint8(),
+            cuda_row_data_->cuda_column_hist_offsets(),
+            cuda_row_data_->cuda_partition_hist_offsets(),
+            cuda_row_data_->cuda_feature_partition_column_index_offsets(),
+            num_data_);
+        }
       } else if (cuda_row_data_->bit_type() == 16) {
-        CUDAConstructDiscretizedHistogramDenseKernel<uint16_t, SHARED_HIST_SIZE, false><<<grid_dim, block_dim, 0, cuda_stream_>>>(
-          cuda_smaller_leaf_splits,
-          reinterpret_cast<const int32_t*>(cuda_gradients_),
-          cuda_row_data_->cuda_data_uint16(),
-          cuda_row_data_->cuda_column_hist_offsets(),
-          cuda_row_data_->cuda_partition_hist_offsets(),
-          cuda_row_data_->cuda_feature_partition_column_index_offsets(),
-          num_data_);
+        if (num_data_per_block <= 255 / grad_discretized_bins_) {
+          ++total_hist_construct_8bit_;
+          CUDAConstructDiscretized8BitHistogramDenseKernel<uint16_t, SHARED_HIST_SIZE, false><<<grid_dim, block_dim, 0, cuda_stream_>>>(
+            cuda_smaller_leaf_splits,
+            reinterpret_cast<const int16_t*>(cuda_8bit_gradients_and_hessians_),
+            cuda_row_data_->cuda_data_uint16(),
+            cuda_row_data_->cuda_column_hist_offsets(),
+            cuda_row_data_->cuda_partition_hist_offsets(),
+            cuda_row_data_->cuda_feature_partition_column_index_offsets(),
+            num_data_);
+        } else {
+          CUDAConstructDiscretizedHistogramDenseKernel<uint16_t, SHARED_HIST_SIZE, false><<<grid_dim, block_dim, 0, cuda_stream_>>>(
+            cuda_smaller_leaf_splits,
+            reinterpret_cast<const int32_t*>(cuda_gradients_),
+            cuda_row_data_->cuda_data_uint16(),
+            cuda_row_data_->cuda_column_hist_offsets(),
+            cuda_row_data_->cuda_partition_hist_offsets(),
+            cuda_row_data_->cuda_feature_partition_column_index_offsets(),
+            num_data_);
+        }
       } else if (cuda_row_data_->bit_type() == 32) {
-        CUDAConstructDiscretizedHistogramDenseKernel<uint32_t, SHARED_HIST_SIZE, false><<<grid_dim, block_dim, 0, cuda_stream_>>>(
-          cuda_smaller_leaf_splits,
-          reinterpret_cast<const int32_t*>(cuda_gradients_),
-          cuda_row_data_->cuda_data_uint32(),
-          cuda_row_data_->cuda_column_hist_offsets(),
-          cuda_row_data_->cuda_partition_hist_offsets(),
-          cuda_row_data_->cuda_feature_partition_column_index_offsets(),
-          num_data_);
+        if (num_data_per_block <= 255 / grad_discretized_bins_) {
+          ++total_hist_construct_8bit_;
+          CUDAConstructDiscretized8BitHistogramDenseKernel<uint32_t, SHARED_HIST_SIZE, false><<<grid_dim, block_dim, 0, cuda_stream_>>>(
+            cuda_smaller_leaf_splits,
+            reinterpret_cast<const int16_t*>(cuda_8bit_gradients_and_hessians_),
+            cuda_row_data_->cuda_data_uint32(),
+            cuda_row_data_->cuda_column_hist_offsets(),
+            cuda_row_data_->cuda_partition_hist_offsets(),
+            cuda_row_data_->cuda_feature_partition_column_index_offsets(),
+            num_data_);
+        } else {
+          CUDAConstructDiscretizedHistogramDenseKernel<uint32_t, SHARED_HIST_SIZE, false><<<grid_dim, block_dim, 0, cuda_stream_>>>(
+            cuda_smaller_leaf_splits,
+            reinterpret_cast<const int32_t*>(cuda_gradients_),
+            cuda_row_data_->cuda_data_uint32(),
+            cuda_row_data_->cuda_column_hist_offsets(),
+            cuda_row_data_->cuda_partition_hist_offsets(),
+            cuda_row_data_->cuda_feature_partition_column_index_offsets(),
+            num_data_);
+        }
       }
     } else {
       if (cuda_row_data_->bit_type() == 8) {
