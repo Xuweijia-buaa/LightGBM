@@ -321,6 +321,7 @@ inline void Linkers::SendRecv(int send_rank, char* send_data, int send_len,
 
 #ifdef USE_MPI
 
+template <bool USE_COMPRESS, int HIST_BITS>
 inline void Linkers::Recv(int rank, char* data, int len) const {
   MPI_Status status;
   int read_cnt = 0;
@@ -332,6 +333,7 @@ inline void Linkers::Recv(int rank, char* data, int len) const {
   }
 }
 
+template <bool USE_COMPRESS, int HIST_BITS>
 inline void Linkers::Send(int rank, char* data, int len) const {
   if (len <= 0) {
     return;
@@ -342,6 +344,7 @@ inline void Linkers::Send(int rank, char* data, int len) const {
   MPI_SAFE_CALL(MPI_Wait(&send_request, &status));
 }
 
+template <bool USE_COMPRESS, int HIST_BITS>
 inline void Linkers::SendRecv(int send_rank, char* send_data, int send_len,
                               int recv_rank, char* recv_data, int recv_len) {
   MPI_Request send_request;
