@@ -117,7 +117,7 @@ void GradientDiscretizer::DiscretizeGradients(
         discretized_int8[2 * i] = static_cast<int8_t>(1);
       }
     } else {
-      //#pragma omp parallel for schedule(static) num_threads(num_threads)
+      #pragma omp parallel for schedule(static) num_threads(num_threads)
       for (data_size_t i = 0; i < num_data; ++i) {
         const double gradient = input_gradients[i];
         const data_size_t random_value_pos = (i + random_values_use_start) % num_data;
