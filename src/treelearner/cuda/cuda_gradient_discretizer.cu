@@ -108,16 +108,16 @@ __global__ void DiscretizeGradientsKernel(
       const score_t gradient_random_value = gradient_random_values[index_offset];
       const score_t hessian_random_value = hessian_random_values[index_offset];
       output_gradients_and_hessians_ptr[2 * index + 1] = gradient > 0.0f ?
-        std::round(gradient * grad_scale + gradient_random_value) :
-        std::round(gradient * grad_scale - gradient_random_value);
-      output_gradients_and_hessians_ptr[2 * index] = std::round(hessian * hess_scale + hessian_random_value);
+        static_cast<int16_t>(gradient * grad_scale + gradient_random_value) :
+        static_cast<int16_t>(gradient * grad_scale - gradient_random_value);
+      output_gradients_and_hessians_ptr[2 * index] = static_cast<int16_t>(hessian * hess_scale + hessian_random_value);
     } else {
       const score_t gradient = input_gradients[index];
       const score_t hessian = input_hessians[index];
       output_gradients_and_hessians_ptr[2 * index + 1] = gradient > 0.0f ?
-        std::round(gradient * grad_scale + 0.5) :
-        std::round(gradient * grad_scale - 0.5);
-      output_gradients_and_hessians_ptr[2 * index] = std::round(hessian * hess_scale + 0.5);
+        static_cast<int16_t>(gradient * grad_scale + 0.5) :
+        static_cast<int16_t>(gradient * grad_scale - 0.5);
+      output_gradients_and_hessians_ptr[2 * index] = static_cast<int16_t>(hessian * hess_scale + 0.5);
     }
   }
 }
