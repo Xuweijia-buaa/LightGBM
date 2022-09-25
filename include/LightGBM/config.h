@@ -1035,6 +1035,9 @@ struct Config {
   // desc = whether to renew the leaf values with original gradients
   bool discretized_grad_renew = false;
 
+  // desc = whether to use stochastic rounding in gradient quantization
+  bool stochastic_rounding = true;
+
   // desc = the presumed factor used to divide data on leaf into bins
   int per_bin_div = 100;
 

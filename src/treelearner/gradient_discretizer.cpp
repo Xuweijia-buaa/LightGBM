@@ -105,25 +105,47 @@ void GradientDiscretizer::DiscretizeGradients(
   const int num_threads = OMP_NUM_THREADS();
   const int random_values_use_start = random_values_use_start_dist_(random_values_use_start_eng_);
   int8_t* discretized_int8 = discretized_gradients_and_hessians_vector_.data();
-  if (is_constant_hessian_) {
-    #pragma omp parallel for schedule(static) num_threads(num_threads)
-    for (data_size_t i = 0; i < num_data; ++i) {
-      const double gradient = input_gradients[i];
-      const data_size_t random_value_pos = (i + random_values_use_start) % num_data;
-      discretized_int8[2 * i + 1] = gradient >= 0.0f ?
-        static_cast<int8_t>(gradient * inverse_gradient_scale_ + gradient_random_values_[random_value_pos]) :
-        static_cast<int8_t>(gradient * inverse_gradient_scale_ - gradient_random_values_[random_value_pos]);
-      discretized_int8[2 * i] = static_cast<int8_t>(1);
+  if (stochastic_rounding_) {
+    if (is_constant_hessian_) {
+      #pragma omp parallel for schedule(static) num_threads(num_threads)
+      for (data_size_t i = 0; i < num_data; ++i) {
+        const double gradient = input_gradients[i];
+        const data_size_t random_value_pos = (i + random_values_use_start) % num_data;
+        discretized_int8[2 * i + 1] = gradient >= 0.0f ?
+          std::round(gradient * inverse_gradient_scale_ + gradient_random_values_[random_value_pos]) :
+          std::round(gradient * inverse_gradient_scale_ - gradient_random_values_[random_value_pos]);
+        discretized_int8[2 * i] = static_cast<int8_t>(1);
+      }
+    } else {
+      #pragma omp parallel for schedule(static) num_threads(num_threads)
+      for (data_size_t i = 0; i < num_data; ++i) {
+        const double gradient = input_gradients[i];
+        const data_size_t random_value_pos = (i + random_values_use_start) % num_data;
+        discretized_int8[2 * i + 1] = gradient >= 0.0f ?
+          std::round(gradient * inverse_gradient_scale_ + gradient_random_values_[random_value_pos]) :
+          std::round(gradient * inverse_gradient_scale_ - gradient_random_values_[random_value_pos]);
+        discretized_int8[2 * i] = std::round(input_hessians[i] * inverse_hessian_scale_ + hessian_random_values_[random_value_pos]);
+      }
     }
   } else {
-    #pragma omp parallel for schedule(static) num_threads(num_threads)
-    for (data_size_t i = 0; i < num_data; ++i) {
-      const double gradient = input_gradients[i];
-      const data_size_t random_value_pos = (i + random_values_use_start) % num_data;
-      discretized_int8[2 * i + 1] = gradient >= 0.0f ?
-        static_cast<int8_t>(gradient * inverse_gradient_scale_ + gradient_random_values_[random_value_pos]) :
-        static_cast<int8_t>(gradient * inverse_gradient_scale_ - gradient_random_values_[random_value_pos]);
-      discretized_int8[2 * i] = static_cast<int8_t>(input_hessians[i] * inverse_hessian_scale_ + hessian_random_values_[random_value_pos]);
+    if (is_constant_hessian_) {
+      #pragma omp parallel for schedule(static) num_threads(num_threads)
+      for (data_size_t i = 0; i < num_data; ++i) {
+        const double gradient = input_gradients[i];
+        discretized_int8[2 * i + 1] = gradient >= 0.0f ?
+          std::round(gradient * inverse_gradient_scale_ + 0.5) :
+          std::round(gradient * inverse_gradient_scale_ - 0.5);
+        discretized_int8[2 * i] = static_cast<int8_t>(1);
+      }
+    } else {
+      #pragma omp parallel for schedule(static) num_threads(num_threads)
+      for (data_size_t i = 0; i < num_data; ++i) {
+        const double gradient = input_gradients[i];
+        discretized_int8[2 * i + 1] = gradient >= 0.0f ?
+          std::round(gradient * inverse_gradient_scale_ + 0.5) :
+          std::round(gradient * inverse_gradient_scale_ - 0.5);
+        discretized_int8[2 * i] = std::round(input_hessians[i] * inverse_hessian_scale_ + 0.5);
+      }
     }
   }
 }

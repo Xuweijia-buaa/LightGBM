@@ -75,7 +75,7 @@ void SerialTreeLearner::Init(const Dataset* train_data, bool is_constant_hessian
     leaf_num_bits_in_histogram_acc_.resize(config_->num_leaves, 0);
     node_num_bits_in_histogram_bin_.resize(config_->num_leaves, 0);
     node_num_bits_in_histogram_acc_.resize(config_->num_leaves, 0);
-    gradient_discretizer_.reset(new GradientDiscretizer(config_->grad_discretize_bins, config_->num_iterations, config_->seed, false, is_constant_hessian));
+    gradient_discretizer_.reset(new GradientDiscretizer(config_->grad_discretize_bins, config_->num_iterations, config_->seed, false, is_constant_hessian, config_->stochastic_rounding));
     gradient_discretizer_->Init(num_data_);
     ordered_int_gradients_and_hessians_.resize(2 * num_data_);
   }

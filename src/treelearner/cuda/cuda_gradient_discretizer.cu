@@ -82,6 +82,7 @@ __global__ void ReduceBlockMinMaxKernel(
   }
 }
 
+template <bool STOCHASTIC_ROUNDING>
 __global__ void DiscretizeGradientsKernel(
   const data_size_t num_data,
   const score_t* input_gradients,
@@ -100,15 +101,24 @@ __global__ void DiscretizeGradientsKernel(
   const score_t hess_scale = *hess_scale_ptr;
   int16_t* output_gradients_and_hessians_ptr = reinterpret_cast<int16_t*>(output_gradients_and_hessians);
   if (index < num_data) {
-    const data_size_t index_offset = (index + start) % num_data;
-    const score_t gradient = input_gradients[index];
-    const score_t hessian = input_hessians[index];
-    const score_t gradient_random_value = gradient_random_values[index_offset];
-    const score_t hessian_random_value = hessian_random_values[index_offset];
-    output_gradients_and_hessians_ptr[2 * index + 1] = gradient > 0.0f ?
-      static_cast<int16_t>(gradient * grad_scale + gradient_random_value) :
-      static_cast<int16_t>(gradient * grad_scale - gradient_random_value);
-    output_gradients_and_hessians_ptr[2 * index] = static_cast<int16_t>(hessian * hess_scale + hessian_random_value);
+    if (STOCHASTIC_ROUNDING) {
+      const data_size_t index_offset = (index + start) % num_data;
+      const score_t gradient = input_gradients[index];
+      const score_t hessian = input_hessians[index];
+      const score_t gradient_random_value = gradient_random_values[index_offset];
+      const score_t hessian_random_value = hessian_random_values[index_offset];
+      output_gradients_and_hessians_ptr[2 * index + 1] = gradient > 0.0f ?
+        std::round(gradient * grad_scale + gradient_random_value) :
+        std::round(gradient * grad_scale - gradient_random_value);
+      output_gradients_and_hessians_ptr[2 * index] = std::round(hessian * hess_scale + hessian_random_value);
+    } else {
+      const score_t gradient = input_gradients[index];
+      const score_t hessian = input_hessians[index];
+      output_gradients_and_hessians_ptr[2 * index + 1] = gradient > 0.0f ?
+        std::round(gradient * grad_scale + 0.5) :
+        std::round(gradient * grad_scale - 0.5);
+      output_gradients_and_hessians_ptr[2 * index] = std::round(hessian * hess_scale + 0.5);
+    }
   }
 }
 
@@ -152,19 +162,26 @@ void CUDAGradientDiscretizer::DiscretizeGradients(
     CUDASUCCESS_OR_FATAL(cudaStreamSynchronize(cuda_stream));
     CUDASUCCESS_OR_FATAL(cudaStreamDestroy(cuda_stream));
   }
-  DiscretizeGradientsKernel<<<num_reduce_blocks_, CUDA_GRADIENT_DISCRETIZER_BLOCK_SIZE>>>(
-    num_data,
-    input_gradients,
-    input_hessians,
-    grad_min_block_buffer_.RawData(),
-    hess_min_block_buffer_.RawData(),
-    iter_,
-    random_values_use_start_.RawData(),
-    gradient_random_values_.RawData(),
-    hessian_random_values_.RawData(),
-    grad_discretize_bins_,
-    discretized_gradients_and_hessians_.RawData());
-    SynchronizeCUDADevice(__FILE__, __LINE__);
+
+  #define DiscretizeGradientsKernel_ARGS \
+    num_data, \
+    input_gradients, \
+    input_hessians, \
+    grad_min_block_buffer_.RawData(), \
+    hess_min_block_buffer_.RawData(), \
+    iter_, \
+    random_values_use_start_.RawData(), \
+    gradient_random_values_.RawData(), \
+    hessian_random_values_.RawData(), \
+    grad_discretize_bins_, \
+    discretized_gradients_and_hessians_.RawData()
+
+  if (stochastic_rounding_) {
+    DiscretizeGradientsKernel<true><<<num_reduce_blocks_, CUDA_GRADIENT_DISCRETIZER_BLOCK_SIZE>>>(DiscretizeGradientsKernel_ARGS);
+  } else {
+    DiscretizeGradientsKernel<false><<<num_reduce_blocks_, CUDA_GRADIENT_DISCRETIZER_BLOCK_SIZE>>>(DiscretizeGradientsKernel_ARGS);
+  }
+  SynchronizeCUDADevice(__FILE__, __LINE__);
   ++iter_;
 }
 

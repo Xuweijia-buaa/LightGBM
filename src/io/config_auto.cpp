@@ -306,6 +306,7 @@ const std::unordered_set<std::string>& Config::parameter_set() {
   "use_discretized_grad",
   "grad_discretize_bins",
   "discretized_grad_renew",
+  "stochastic_rounding",
   "per_bin_div",
   "use_compressed_histogram_distributed",
   "num_gpu",
@@ -641,6 +642,8 @@ void Config::GetMembersFromString(const std::unordered_map<std::string, std::str
   GetInt(params, "grad_discretize_bins", &grad_discretize_bins);
 
   GetBool(params, "discretized_grad_renew", &discretized_grad_renew);
+
+  GetBool(params, "stochastic_rounding", &stochastic_rounding);
 
   GetInt(params, "per_bin_div", &per_bin_div);
 
