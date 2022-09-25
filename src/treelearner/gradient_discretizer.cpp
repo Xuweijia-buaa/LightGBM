@@ -112,19 +112,19 @@ void GradientDiscretizer::DiscretizeGradients(
         const double gradient = input_gradients[i];
         const data_size_t random_value_pos = (i + random_values_use_start) % num_data;
         discretized_int8[2 * i + 1] = gradient >= 0.0f ?
-          std::round(gradient * inverse_gradient_scale_ + gradient_random_values_[random_value_pos]) :
-          std::round(gradient * inverse_gradient_scale_ - gradient_random_values_[random_value_pos]);
+          std::trunc(gradient * inverse_gradient_scale_ + gradient_random_values_[random_value_pos]) :
+          std::trunc(gradient * inverse_gradient_scale_ - gradient_random_values_[random_value_pos]);
         discretized_int8[2 * i] = static_cast<int8_t>(1);
       }
     } else {
-      #pragma omp parallel for schedule(static) num_threads(num_threads)
+      //#pragma omp parallel for schedule(static) num_threads(num_threads)
       for (data_size_t i = 0; i < num_data; ++i) {
         const double gradient = input_gradients[i];
         const data_size_t random_value_pos = (i + random_values_use_start) % num_data;
         discretized_int8[2 * i + 1] = gradient >= 0.0f ?
-          std::round(gradient * inverse_gradient_scale_ + gradient_random_values_[random_value_pos]) :
-          std::round(gradient * inverse_gradient_scale_ - gradient_random_values_[random_value_pos]);
-        discretized_int8[2 * i] = std::round(input_hessians[i] * inverse_hessian_scale_ + hessian_random_values_[random_value_pos]);
+          std::trunc(gradient * inverse_gradient_scale_ + gradient_random_values_[random_value_pos]) :
+          std::trunc(gradient * inverse_gradient_scale_ - gradient_random_values_[random_value_pos]);
+        discretized_int8[2 * i] = std::trunc(input_hessians[i] * inverse_hessian_scale_ + hessian_random_values_[random_value_pos]);
       }
     }
   } else {
@@ -133,8 +133,8 @@ void GradientDiscretizer::DiscretizeGradients(
       for (data_size_t i = 0; i < num_data; ++i) {
         const double gradient = input_gradients[i];
         discretized_int8[2 * i + 1] = gradient >= 0.0f ?
-          std::round(gradient * inverse_gradient_scale_ + 0.5) :
-          std::round(gradient * inverse_gradient_scale_ - 0.5);
+          std::trunc(gradient * inverse_gradient_scale_ + 0.5) :
+          std::trunc(gradient * inverse_gradient_scale_ - 0.5);
         discretized_int8[2 * i] = static_cast<int8_t>(1);
       }
     } else {
@@ -142,9 +142,9 @@ void GradientDiscretizer::DiscretizeGradients(
       for (data_size_t i = 0; i < num_data; ++i) {
         const double gradient = input_gradients[i];
         discretized_int8[2 * i + 1] = gradient >= 0.0f ?
-          std::round(gradient * inverse_gradient_scale_ + 0.5) :
-          std::round(gradient * inverse_gradient_scale_ - 0.5);
-        discretized_int8[2 * i] = std::round(input_hessians[i] * inverse_hessian_scale_ + 0.5);
+          std::trunc(gradient * inverse_gradient_scale_ + 0.5) :
+          std::trunc(gradient * inverse_gradient_scale_ - 0.5);
+        discretized_int8[2 * i] = std::trunc(input_hessians[i] * inverse_hessian_scale_ + 0.5);
       }
     }
   }
