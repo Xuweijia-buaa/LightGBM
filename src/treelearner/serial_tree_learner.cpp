@@ -488,6 +488,17 @@ void SerialTreeLearner::ConstructHistograms(
   }
 }
 
+template <typename PACKED_GRAD_HESS_T, int HIST_BITS>
+void get_grad_hess2(PACKED_GRAD_HESS_T grad_hess, int64_t* grad, int64_t* hess) {
+  if (HIST_BITS == 32) {
+    *grad = static_cast<int64_t>(static_cast<int32_t>(grad_hess >> 32));
+    *hess = static_cast<int64_t>(static_cast<uint32_t>(grad_hess & 0x00000000ffffffff));
+  } else {
+    *grad = static_cast<int64_t>(static_cast<int16_t>(grad_hess >> 16));
+    *hess = static_cast<int64_t>(static_cast<uint16_t>(grad_hess & 0x0000ffff));
+  }
+}
+
 void SerialTreeLearner::FindBestSplitsFromHistograms(
     const std::vector<int8_t>& is_feature_used, bool use_subtract, const Tree* tree) {
   Common::FunctionTimer fun_timer(
@@ -528,7 +539,7 @@ void SerialTreeLearner::FindBestSplitsFromHistograms(
 const uint8_t hist_bits_bin = leaf_num_bits_in_histogram_bin_[smaller_leaf_splits_->leaf_index()];
 const uint8_t hist_bits_acc = leaf_num_bits_in_histogram_acc_[smaller_leaf_splits_->leaf_index()];
   OMP_INIT_EX();
-#pragma omp parallel for schedule(static) num_threads(share_state_->num_threads)
+//#pragma omp parallel for schedule(static) num_threads(share_state_->num_threads)
   for (int feature_index = 0; feature_index < num_features_; ++feature_index) {
     OMP_LOOP_EX_BEGIN();
     if (!is_feature_used[feature_index]) {
@@ -537,6 +548,9 @@ const uint8_t hist_bits_acc = leaf_num_bits_in_histogram_acc_[smaller_leaf_split
     const int tid = omp_get_thread_num();
     if (config_->use_discretized_grad) {
       const int64_t int_sum_gradient_and_hessian = smaller_leaf_splits_->int_sum_gradients_and_hessians();
+      //int64_t grad = 0, hess = 0;
+      //get_grad_hess2<int64_t, 32>(int_sum_gradient_and_hessian, &grad, &hess);
+      //Log::Warning("smaller int_sum_gradient_and_hessian = %ld, grad = %ld, hess = %ld", int_sum_gradient_and_hessian, grad, hess);
       if (hist_bits_acc <= 16) {
         CHECK_LE(hist_bits_bin, 16);
         train_data_->FixHistogramInt<int32_t, int32_t, 16, 16>(
@@ -587,6 +601,9 @@ const uint8_t hist_bits_acc = leaf_num_bits_in_histogram_acc_[smaller_leaf_split
               smaller_leaf_histogram_array_[feature_index]);
         } else if (larger_hist_bits <= 16) {
           CHECK_LE(smaller_hist_bits, 16);
+          /*if (feature_index == 0) {
+            Log::Warning("using buffer !!!!!");
+          }*/
           larger_leaf_histogram_array_[feature_index].Subtract<true, int64_t, int32_t, int32_t, 32, 16, 16>(
               smaller_leaf_histogram_array_[feature_index], change_hist_bits_buffer_[feature_index].data());
         } else if (smaller_hist_bits <= 16) {
@@ -603,6 +620,9 @@ const uint8_t hist_bits_acc = leaf_num_bits_in_histogram_acc_[smaller_leaf_split
     } else {
       if (config_->use_discretized_grad) {
         const int64_t int_sum_gradient_and_hessian = larger_leaf_splits_->int_sum_gradients_and_hessians();
+        //int64_t grad = 0, hess = 0;
+        //get_grad_hess2<int64_t, 32>(int_sum_gradient_and_hessian, &grad, &hess);
+        //Log::Warning("larger int_sum_gradient_and_hessian = %ld, grad = %ld, hess = %ld", int_sum_gradient_and_hessian, grad, hess);
         const uint8_t hist_bits_bin = leaf_num_bits_in_histogram_bin_[larger_leaf_splits_->leaf_index()];
         const uint8_t hist_bits_acc = leaf_num_bits_in_histogram_acc_[larger_leaf_splits_->leaf_index()];
         if (hist_bits_acc <= 16) {
@@ -778,6 +798,15 @@ void SerialTreeLearner::SplitInner(Tree* tree, int best_leaf, int* left_leaf,
   *left_leaf = best_leaf;
   auto next_leaf_id = tree->NextLeafId();
 
+  // const int64_t left_sum_grad_hess = best_split_info.left_sum_gradient_and_hessian;
+  // const int64_t right_sum_grad_hess = best_split_info.right_sum_gradient_and_hessian;
+  // const int32_t left_sum_grad = static_cast<int32_t>(left_sum_grad_hess >> 32);
+  // const uint32_t left_sum_hess = static_cast<uint32_t>(left_sum_grad_hess & 0x00000000ffffffff);
+  // const int32_t right_sum_grad = static_cast<int32_t>(right_sum_grad_hess >> 32);
+  // const uint32_t right_sum_hess = static_cast<uint32_t>(right_sum_grad_hess & 0x00000000ffffffff);
+  // Log::Warning("leaf_id = %d, feature_index = %d, left_sum_grad = %d, left_sum_hess = %d, right_sum_grad = %d, right_sum_hess = %d",
+  //   best_leaf, best_split_info.feature, left_sum_grad, left_sum_hess, right_sum_grad, right_sum_hess);
+
   // update before tree split
   constraints_->BeforeSplit(best_leaf, next_leaf_id,
                             best_split_info.monotone_type);
@@ -902,6 +931,14 @@ void SerialTreeLearner::SplitInner(Tree* tree, int best_leaf, int* left_leaf,
                                 best_split_info.left_output);
     }
   }
+
+  // int64_t grad = 0, hess = 0;
+  // get_grad_hess2<int64_t, 32>(smaller_leaf_splits_->int_sum_gradients_and_hessians(), &grad, &hess);
+  // Log::Warning("smaller_leaf_splits_->int_sum_gradients_and_hessians() = %ld, grad = %ld, hess = %ld",
+  //   smaller_leaf_splits_->int_sum_gradients_and_hessians(), grad, hess);
+  // get_grad_hess2<int64_t, 32>(larger_leaf_splits_->int_sum_gradients_and_hessians(), &grad, &hess);
+  // Log::Warning("larger_leaf_splits_->int_sum_gradients_and_hessians() = %ld, grad = %ld, hess = %ld",
+  //   larger_leaf_splits_->int_sum_gradients_and_hessians(), grad, hess);
   SetNumBitsInHistogramBin(*left_leaf, *right_leaf);
   auto leaves_need_update = constraints_->Update(
       is_numerical_split, *left_leaf, *right_leaf,

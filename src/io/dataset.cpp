@@ -1574,6 +1574,17 @@ void Dataset::FixHistogram(int feature_idx, double sum_gradient,
   }
 }
 
+template <typename PACKED_GRAD_HESS_T, int HIST_BITS>
+void get_grad_hess(PACKED_GRAD_HESS_T grad_hess, int64_t* grad, int64_t* hess) {
+  if (HIST_BITS == 32) {
+    *grad = static_cast<int64_t>(static_cast<int32_t>(grad_hess >> 32));
+    *hess = static_cast<int64_t>(static_cast<uint32_t>(grad_hess & 0x00000000ffffffff));
+  } else {
+    *grad = static_cast<int64_t>(static_cast<int16_t>(grad_hess >> 16));
+    *hess = static_cast<int64_t>(static_cast<uint16_t>(grad_hess & 0x0000ffff));
+  }
+}
+
 template <typename PACKED_HIST_BIN_T, typename PACKED_HIST_ACC_T, int HIST_BITS_BIN, int HIST_BITS_ACC>
 void Dataset::FixHistogramInt(int feature_idx, int64_t int_sum_gradient_and_hessian, hist_t* data) const {
   const int group = feature2group_[feature_idx];
@@ -1586,15 +1597,39 @@ void Dataset::FixHistogramInt(int feature_idx, int64_t int_sum_gradient_and_hess
     ((static_cast<int32_t>(int_sum_gradient_and_hessian >> 32) << 16) |
     static_cast<int32_t>(int_sum_gradient_and_hessian & 0x0000ffff)) :
     int_sum_gradient_and_hessian;
+  std::vector<int64_t> grads, hesss, most_freq_grads, most_freq_hesss;
+  int64_t grad = 0, hess = 0;
+  get_grad_hess<PACKED_HIST_ACC_T, HIST_BITS_ACC>(int_sum_gradient_and_hessian_local, &grad, &hess);
+  most_freq_grads.push_back(grad);
+  most_freq_hesss.push_back(hess);
   if (most_freq_bin > 0) {
     const int num_bin = bin_mapper->num_bin();
     if (HIST_BITS_BIN == HIST_BITS_ACC) {
       for (int i = 0; i < num_bin; ++i) {
         if (i != most_freq_bin) {
+          get_grad_hess<PACKED_HIST_ACC_T, HIST_BITS_ACC>(data_ptr[i], &grad, &hess);
+          grads.push_back(grad);
+          hesss.push_back(hess);
           int_sum_gradient_and_hessian_local -= data_ptr[i];
+          get_grad_hess<PACKED_HIST_ACC_T, HIST_BITS_ACC>(int_sum_gradient_and_hessian_local, &grad, &hess);
+          most_freq_grads.push_back(grad);
+          most_freq_hesss.push_back(hess);
+          if (data_ptr[i] == -1) {
+            Log::Warning("feature_idx = %d, i = %d, data_ptr[%d] = %d", feature_idx, i, i, data_ptr[i]);
+          }
         }
       }
+      grads.push_back(0);
+      hesss.push_back(0);
       data_ptr[most_freq_bin] = int_sum_gradient_and_hessian_local;
+      if (int_sum_gradient_and_hessian_local == -1) {
+        for (size_t i = 0; i < most_freq_grads.size(); ++i) {
+          Log::Warning("most_freq_grads[%d] = %ld, most_freq_hesss[%d] = %ld, grads[%d] = %ld, hesss[%d] = %ld",
+            i, most_freq_grads[i], i, most_freq_hesss[i], i, grads[i], i, hesss[i]);
+        }
+        Log::Warning("HIST_BITS_BIN = %d, HIST_BITS_ACC = %d", HIST_BITS_BIN, HIST_BITS_ACC);
+        Log::Warning("feature_idx = %d, most_freq_bin = %d, int_sum_gradient_and_hessian_local = %ld", feature_idx, most_freq_bin, int_sum_gradient_and_hessian_local);
+      }
     } else {
       CHECK_EQ(HIST_BITS_ACC, 32);
       CHECK_EQ(HIST_BITS_BIN, 16);
@@ -1604,11 +1639,17 @@ void Dataset::FixHistogramInt(int feature_idx, int64_t int_sum_gradient_and_hess
           const PACKED_HIST_ACC_T packed_hist_acc = (static_cast<int64_t>(static_cast<int16_t>(packed_hist >> 16)) << 32) |
             static_cast<int64_t>(packed_hist & 0x0000ffff);
           int_sum_gradient_and_hessian_local -= packed_hist_acc;
+          if (packed_hist == -1) {
+            Log::Warning("feature_idx = %d, i = %d, packed_hist = %d", feature_idx, i, packed_hist);
+          }
         }
       }
       PACKED_HIST_BIN_T int_sum_gradient_and_hessian_local_bin =
         (static_cast<int32_t>(int_sum_gradient_and_hessian_local >> 32) << 16) | static_cast<int32_t>(int_sum_gradient_and_hessian_local & 0x0000ffff);
       data_ptr[most_freq_bin] = int_sum_gradient_and_hessian_local_bin;
+      if (int_sum_gradient_and_hessian_local_bin == -1) {
+        Log::Warning("feature_idx = %d, most_freq_bin = %d, int_sum_gradient_and_hessian_local_bin = %d", feature_idx, most_freq_bin, int_sum_gradient_and_hessian_local_bin);
+      }
     }
   }
 }

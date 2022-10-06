@@ -236,7 +236,7 @@ class LeafSplits {
   double sum_hessians() const { return sum_hessians_; }
 
   /*! \brief Get sum of discretized gradients and Hessians of current leaf */
-  double int_sum_gradients_and_hessians() const { return int_sum_gradients_and_hessians_; }
+  int64_t int_sum_gradients_and_hessians() const { return int_sum_gradients_and_hessians_; }
 
   /*! \brief Get indices of data of current leaf */
   const data_size_t* data_indices() const { return data_indices_; }

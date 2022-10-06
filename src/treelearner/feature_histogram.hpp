@@ -129,9 +129,27 @@ class FeatureHistogram {
             (static_cast<int64_t>(static_cast<int16_t>(other_grad_hess >> 16)) << 32) |
             (static_cast<int64_t>(other_grad_hess & 0x0000ffff));
           const int64_t result_grad_hess = this_grad_hess - other_grad_hess_int64;
+          const int32_t this_grad = static_cast<int32_t>(this_grad_hess >> 32);
+          const uint32_t this_hess = static_cast<uint32_t>(this_grad_hess & 0x00000000ffffffff);
+          const int32_t other_grad = static_cast<int32_t>(other_grad_hess >> 16);
+          const int16_t other_grad_int16 = static_cast<int16_t>(other_grad_hess >> 16);
+          const uint32_t other_hess = static_cast<uint32_t>(other_grad_hess & 0x0000ffff);
+          const uint16_t other_hess_int16 = static_cast<uint16_t>(other_grad_hess & 0x0000ffff);
+
           const int32_t result_grad_hess_int32 =
             (static_cast<int32_t>(result_grad_hess >> 32) << 16) |
-            static_cast<int32_t>(result_grad_hess & 0x00000000ffffffff);
+            static_cast<int32_t>(result_grad_hess & 0x0000ffff);
+          if (static_cast<int32_t>(result_grad_hess & 0x0000ffff) != static_cast<int32_t>(result_grad_hess & 0x00000000ffffffff)) {
+            Log::Warning("result_grad_hess = %x", result_grad_hess);
+            Log::Warning("result_grad_hess_int32 = %x", result_grad_hess_int32);
+            Log::Warning("this_grad_hess = %lx, %ld", this_grad_hess, this_grad_hess);
+            Log::Warning("other_grad_hess = %x, %d", other_grad_hess, other_grad_hess);
+            Log::Warning("static_cast<int32_t>(result_grad_hess & 0x0000ffff) = %d", static_cast<int32_t>(result_grad_hess & 0x0000ffff));
+            Log::Warning("static_cast<int32_t>(result_grad_hess & 0x00000000ffffffff) = %d", static_cast<int32_t>(result_grad_hess & 0x00000000ffffffff));
+            Log::Warning("this_grad = %d, this_hess = %d, other_grad = %d, other_hess = %d", this_grad, this_hess, other_grad, other_hess);
+            Log::Warning("other_grad_int16 = %d, other_hess_int16 = %d", other_grad_int16, other_hess_int16);
+          }
+          CHECK_EQ(static_cast<int32_t>(result_grad_hess & 0x0000ffff), static_cast<int32_t>(result_grad_hess & 0x00000000ffffffff));
           result_int_data[i] = result_grad_hess_int32;
         }
       } else {
@@ -1373,6 +1391,9 @@ class FeatureHistogram {
         }
         const PACKED_HIST_BIN_T grad_and_hess = data_ptr[t];
         if (HIST_BITS_ACC != HIST_BITS_BIN) {
+          if (grad_and_hess < 0 && (static_cast<PACKED_HIST_ACC_T>(static_cast<HIST_BIN_T>(grad_and_hess >> HIST_BITS_BIN)) << HIST_BITS_ACC) > 0) {
+            Log::Warning("error !!! %d vs. %d", grad_and_hess, (static_cast<PACKED_HIST_ACC_T>(static_cast<HIST_BIN_T>(grad_and_hess >> HIST_BITS_BIN)) << HIST_BITS_ACC));
+          }
           const PACKED_HIST_ACC_T grad_and_hess_acc = HIST_BITS_BIN == 16 ?
             ((static_cast<PACKED_HIST_ACC_T>(static_cast<HIST_BIN_T>(grad_and_hess >> HIST_BITS_BIN)) << HIST_BITS_ACC) |
             (static_cast<PACKED_HIST_ACC_T>(grad_and_hess & 0x0000ffff))) :
@@ -1467,6 +1488,9 @@ class FeatureHistogram {
           for (int i = 0; i < meta_->num_bin - offset; ++i) {
             const PACKED_HIST_BIN_T grad_and_hess = data_ptr[i];
             if (HIST_BITS_ACC != HIST_BITS_BIN) {
+              if (grad_and_hess < 0 && (static_cast<PACKED_HIST_ACC_T>(static_cast<HIST_BIN_T>(grad_and_hess >> HIST_BITS_BIN)) << HIST_BITS_ACC) > 0) {
+                Log::Warning("error !!! %d vs. %d", grad_and_hess, (static_cast<PACKED_HIST_ACC_T>(static_cast<HIST_BIN_T>(grad_and_hess >> HIST_BITS_BIN)) << HIST_BITS_ACC));
+              }
               const PACKED_HIST_ACC_T grad_and_hess_acc = HIST_BITS_BIN == 16 ?
                 ((static_cast<PACKED_HIST_ACC_T>(static_cast<HIST_BIN_T>(grad_and_hess >> HIST_BITS_BIN)) << HIST_BITS_ACC) |
                 (static_cast<PACKED_HIST_ACC_T>(grad_and_hess & 0x0000ffff))) :
@@ -1490,6 +1514,9 @@ class FeatureHistogram {
         if (t >= 0) {
           const PACKED_HIST_BIN_T grad_and_hess = data_ptr[t];
           if (HIST_BITS_ACC != HIST_BITS_BIN) {
+            if (grad_and_hess < 0 && (static_cast<PACKED_HIST_ACC_T>(static_cast<HIST_BIN_T>(grad_and_hess >> HIST_BITS_BIN)) << HIST_BITS_ACC) > 0) {
+              Log::Warning("error !!! %d vs. %d", grad_and_hess, (static_cast<PACKED_HIST_ACC_T>(static_cast<HIST_BIN_T>(grad_and_hess >> HIST_BITS_BIN)) << HIST_BITS_ACC));
+            }
             const PACKED_HIST_ACC_T grad_and_hess_acc = HIST_BITS_BIN == 16 ?
               ((static_cast<PACKED_HIST_ACC_T>(static_cast<HIST_BIN_T>(grad_and_hess >> HIST_BITS_BIN)) << HIST_BITS_ACC) |
               (static_cast<PACKED_HIST_ACC_T>(grad_and_hess & 0x0000ffff))) :
