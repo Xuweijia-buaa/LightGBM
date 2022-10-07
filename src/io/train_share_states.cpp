@@ -13,7 +13,7 @@ MultiValBinWrapper::MultiValBinWrapper(MultiValBin* bin, data_size_t num_data,
   const int grad_discretize_bins,
   const int per_bin_div):
     feature_groups_contained_(feature_groups_contained) {
-  num_threads_ = OMP_NUM_THREADS();
+  num_threads_ = 1;//OMP_NUM_THREADS();
   num_data_ = num_data;
   multi_val_bin_.reset(bin);
   if (bin == nullptr) {

@@ -494,47 +494,72 @@ void PushDataToMultiValBin(
   Common::FunctionTimer fun_time("Dataset::PushDataToMultiValBin",
                                  global_timer);
   if (ret->IsSparse()) {
-    const int num_threads = OMP_NUM_THREADS();
-    std::vector<std::vector<std::vector<int>>> non_zero_features(num_threads);
-    Threading::For<int>(
-      0, static_cast<int>(most_freq_bins.size()), 1, [&non_zero_features, num_data, iters, &most_freq_bins](int tid, int start, int end) {
-        std::vector<std::vector<int>>& thread_non_zero_features = non_zero_features[tid];
-        thread_non_zero_features.resize(num_data);
-        for (int feature_index = start; feature_index < end; ++feature_index) {
-          BinIterator* iter = (*iters)[0][feature_index].get();
-          const uint32_t most_freq_bin = most_freq_bins[feature_index];
-          data_size_t cur_pos = 0;
-          data_size_t i_delta = -1;
-          iter->InitIndex(0, &i_delta, &cur_pos);
-          iter->Reset(0);
-          do {
-            iter->NextNonZero(&i_delta, &cur_pos);
-            const uint32_t bin = iter->Get(cur_pos);
-            if (cur_pos < num_data && bin != most_freq_bin) {
-              thread_non_zero_features[cur_pos].push_back(feature_index);
-            }
-          } while (cur_pos < num_data);
-        }
-      });
-    CHECK_EQ(non_zero_features[0].size(), static_cast<size_t>(num_data));
-    Threading::For<data_size_t>(0, num_data, 1024, [&non_zero_features, num_threads, num_data] (int /*tid*/, data_size_t start, data_size_t end) {
-      for (data_size_t i = start; i < end; ++i) {
-        std::vector<int>& target = non_zero_features[0][i];
-        for (int thread_index = 1; thread_index < num_threads; ++thread_index) {
-          if (non_zero_features[thread_index].size() > 0) {
-            CHECK_EQ(non_zero_features[thread_index].size(), static_cast<size_t>(num_data));
-            std::vector<int>& source = non_zero_features[thread_index][i];
-            for (size_t j = 0; j < source.size(); ++j) {
-              target.push_back(source[j]);
-            }
-            source.clear();
-            source.shrink_to_fit();
-          }
-        }
-      }
-    });
-    non_zero_features.resize(1);
-    non_zero_features.shrink_to_fit();
+    // const int num_threads = OMP_NUM_THREADS();
+    // std::vector<std::vector<std::vector<int>>> non_zero_features(num_threads);
+    // Threading::For<int>(
+    //   0, static_cast<int>(most_freq_bins.size()), 1, [&non_zero_features, num_data, iters, &most_freq_bins](int tid, int start, int end) {
+    //     std::vector<std::vector<int>>& thread_non_zero_features = non_zero_features[tid];
+    //     thread_non_zero_features.resize(num_data);
+    //     for (int feature_index = start; feature_index < end; ++feature_index) {
+    //       BinIterator* iter = (*iters)[0][feature_index].get();
+    //       const uint32_t most_freq_bin = most_freq_bins[feature_index];
+    //       data_size_t cur_pos = 0;
+    //       data_size_t i_delta = -1;
+    //       iter->InitIndex(0, &i_delta, &cur_pos);
+    //       iter->Reset(0);
+    //       do {
+    //         iter->NextNonZero(&i_delta, &cur_pos);
+    //         const uint32_t bin = iter->Get(cur_pos);
+    //         if (cur_pos < num_data && bin != most_freq_bin) {
+    //           thread_non_zero_features[cur_pos].push_back(feature_index);
+    //         }
+    //       } while (cur_pos < num_data);
+    //     }
+    //   });
+    // CHECK_EQ(non_zero_features[0].size(), static_cast<size_t>(num_data));
+    // Threading::For<data_size_t>(0, num_data, 1024, [&non_zero_features, num_threads, num_data] (int /*tid*/, data_size_t start, data_size_t end) {
+    //   for (data_size_t i = start; i < end; ++i) {
+    //     std::vector<int>& target = non_zero_features[0][i];
+    //     for (int thread_index = 1; thread_index < num_threads; ++thread_index) {
+    //       if (non_zero_features[thread_index].size() > 0) {
+    //         CHECK_EQ(non_zero_features[thread_index].size(), static_cast<size_t>(num_data));
+    //         std::vector<int>& source = non_zero_features[thread_index][i];
+    //         for (size_t j = 0; j < source.size(); ++j) {
+    //           target.push_back(source[j]);
+    //         }
+    //         source.clear();
+    //         source.shrink_to_fit();
+    //       }
+    //     }
+    //   }
+    // });
+    // non_zero_features.resize(1);
+    // non_zero_features.shrink_to_fit();
+    // Threading::For<data_size_t>(
+    //     0, num_data, 1024, [&](int tid, data_size_t start, data_size_t end) {
+    //       std::vector<uint32_t> cur_data;
+    //       cur_data.reserve(most_freq_bins.size());
+    //       for (size_t j = 0; j < most_freq_bins.size(); ++j) {
+    //         (*iters)[tid][j]->Reset(start);
+    //       }
+    //       for (data_size_t i = start; i < end; ++i) {
+    //         cur_data.clear();
+    //         for (size_t j = 0; j < non_zero_features[0][i].size(); ++j) {
+    //           // for sparse multi value bin, we store the feature bin values with offset added
+    //           const int feature_index = non_zero_features[0][i][j];
+    //           auto cur_bin = (*iters)[tid][feature_index]->Get(i);
+    //           if (cur_bin == most_freq_bins[feature_index]) {
+    //             continue;
+    //           }
+    //           cur_bin += offsets[feature_index];
+    //           if (most_freq_bins[feature_index] == 0) {
+    //             cur_bin -= 1;
+    //           }
+    //           cur_data.push_back(cur_bin);
+    //         }
+    //         ret->PushOneRow(tid, i, cur_data);
+    //       }
+    //     });
     Threading::For<data_size_t>(
         0, num_data, 1024, [&](int tid, data_size_t start, data_size_t end) {
           std::vector<uint32_t> cur_data;
@@ -544,15 +569,14 @@ void PushDataToMultiValBin(
           }
           for (data_size_t i = start; i < end; ++i) {
             cur_data.clear();
-            for (size_t j = 0; j < non_zero_features[0][i].size(); ++j) {
+            for (size_t j = 0; j < most_freq_bins.size(); ++j) {
               // for sparse multi value bin, we store the feature bin values with offset added
-              const int feature_index = non_zero_features[0][i][j];
-              auto cur_bin = (*iters)[tid][feature_index]->Get(i);
-              if (cur_bin == most_freq_bins[feature_index]) {
+              auto cur_bin = (*iters)[tid][j]->Get(i);
+              if (cur_bin == most_freq_bins[j]) {
                 continue;
               }
-              cur_bin += offsets[feature_index];
-              if (most_freq_bins[feature_index] == 0) {
+              cur_bin += offsets[j];
+              if (most_freq_bins[j] == 0) {
                 cur_bin -= 1;
               }
               cur_data.push_back(cur_bin);
@@ -1367,6 +1391,13 @@ void Dataset::ConstructHistogramsInner(
     }
   }
   int num_used_dense_group = static_cast<int>(used_dense_group.size());
+  for (int i = 0; i < num_features_; ++i) {
+    if (RealFeatureIndex(i) == 856) {
+      const int gid = Feature2Group(i);
+      Log::Warning("gid = %d, num_features_in_group = %d, feature_in_group_start = %d, i = %d",
+        gid, group_feature_cnt_[gid], group_feature_start_[gid], i);
+    }
+  }
   global_timer.Start("Dataset::dense_bin_histogram");
   auto ptr_ordered_grad = gradients;
   auto ptr_ordered_hess = hessians;
@@ -1405,6 +1436,9 @@ void Dataset::ConstructHistogramsInner(
 #pragma omp parallel for schedule(static) num_threads(share_state->num_threads)
     for (int gi = 0; gi < num_used_dense_group; ++gi) {
       OMP_LOOP_EX_BEGIN();
+      if (gi != 47) {
+        continue;
+      }
       int group = used_dense_group[gi];
       const int num_bin = feature_groups_[group]->num_total_bin_;
       if (USE_DIST_GRAD) {
@@ -1622,7 +1656,7 @@ void Dataset::FixHistogramInt(int feature_idx, int64_t int_sum_gradient_and_hess
       grads.push_back(0);
       hesss.push_back(0);
       data_ptr[most_freq_bin] = int_sum_gradient_and_hessian_local;
-      if (int_sum_gradient_and_hessian_local == -1) {
+      if (int_sum_gradient_and_hessian_local == -1 || feature_idx == 636) {
         for (size_t i = 0; i < most_freq_grads.size(); ++i) {
           Log::Warning("most_freq_grads[%d] = %ld, most_freq_hesss[%d] = %ld, grads[%d] = %ld, hesss[%d] = %ld",
             i, most_freq_grads[i], i, most_freq_hesss[i], i, grads[i], i, hesss[i]);

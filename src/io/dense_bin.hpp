@@ -182,10 +182,15 @@ class DenseBin : public Bin {
                                data_size_t start, data_size_t end,
                                const score_t* ordered_gradients,
                                hist_t* out) const {
+    Log::Warning("dense construct histograms");
     data_size_t i = start;
     PACKED_HIST_T* out_ptr = reinterpret_cast<PACKED_HIST_T*>(out);
     const int16_t* gradients_ptr = reinterpret_cast<const int16_t*>(ordered_gradients);
     const VAL_T* data_ptr_base = data_.data();
+    std::vector<int64_t> grads_local(15, 0), hesss_local(15, 0);
+    bool found = false;
+    uint32_t min_ti = 1000000000;
+    uint32_t max_ti = 0;
     if (USE_PREFETCH) {
       const data_size_t pf_offset = 64 / sizeof(VAL_T);
       const data_size_t pf_end = end - pf_offset;
@@ -209,6 +214,20 @@ class DenseBin : public Bin {
             (static_cast<PACKED_HIST_T>(static_cast<int8_t>(gradient_16 >> 8)) << HIST_BITS) | (1);
           out_ptr[ti] += gradient_packed;
         }
+        if (ti >= 7968 && ti < 7983) {
+          found = true;
+          grads_local[ti - 7968] += static_cast<int64_t>(static_cast<int8_t>(gradient_16 >> 8));
+          hesss_local[ti - 7968] += static_cast<int64_t>(static_cast<int8_t>(gradient_16 & 0xff));
+        }
+        if (ti > max_ti) {
+          max_ti = ti;
+        }
+        if (ti < min_ti) {
+          min_ti = ti;
+        }
+        if (ti > 1000) {
+          Log::Warning("ti = %d", ti);
+        }
       }
     }
     for (; i < end; ++i) {
@@ -224,7 +243,27 @@ class DenseBin : public Bin {
             (static_cast<PACKED_HIST_T>(static_cast<int8_t>(gradient_16 >> 8)) << HIST_BITS) | (1);
         out_ptr[ti] += gradient_packed;
       }
+      if (ti >= 7968 && ti < 7983) {
+        found = true;
+        grads_local[ti - 7968] += static_cast<int64_t>(static_cast<int8_t>(gradient_16 >> 8));
+        hesss_local[ti - 7968] += static_cast<int64_t>(static_cast<int8_t>(gradient_16 & 0xff));
+      }
+      if (ti > max_ti) {
+        max_ti = ti;
+      }
+      if (ti < min_ti) {
+        min_ti = ti;
+      }
+      if (ti > 1000) {
+        Log::Warning("ti = %d", ti);
+      }
     }
+    if (found) {
+      for (size_t i = 0; i < grads_local.size(); ++i) {
+        Log::Warning("local hist bin %d grad %ld hess %ld", i, grads_local[i], hesss_local[i]);
+      }
+    }
+    Log::Warning("min_ti = %d, max_ti = %d", min_ti, max_ti);
   }
 
   void ConstructHistogramInt8(const data_size_t* data_indices, data_size_t start,

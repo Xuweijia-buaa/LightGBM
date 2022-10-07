@@ -210,6 +210,7 @@ class SparseBin : public Bin {
   void ConstructIntHistogramInner(data_size_t start, data_size_t end,
                           const score_t* ordered_gradients_and_hessians,
                           hist_t* out) const {
+    Log::Warning("sparse construct histograms");
     data_size_t i_delta, cur_pos;
     InitIndex(start, &i_delta, &cur_pos);
     if (USE_HESSIAN) {
@@ -245,6 +246,7 @@ class SparseBin : public Bin {
   void ConstructIntHistogramInner(const data_size_t* data_indices, data_size_t start,
                           data_size_t end, const score_t* ordered_gradients_and_hessians,
                           hist_t* out) const {
+    Log::Warning("sparse construct histograms");
     data_size_t i_delta, cur_pos;
     InitIndex(data_indices[start], &i_delta, &cur_pos);
     data_size_t i = start;

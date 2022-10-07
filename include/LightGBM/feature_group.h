@@ -72,6 +72,11 @@ class FeatureGroup {
       bin_offsets_.emplace_back(num_total_bin_);
     }
     CreateBinData(num_data, is_multi_val_, true, false);
+    if (group_id == 47) {
+      for (int i = 0; i < num_feature_; ++i) {
+        Log::Warning("bin_offsets_[%d] = %d", i, bin_offsets_[i]);
+      }
+    }
   }
 
   FeatureGroup(const FeatureGroup& other, int num_data) {

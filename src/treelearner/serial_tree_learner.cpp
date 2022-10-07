@@ -16,6 +16,8 @@
 
 #include "cost_effective_gradient_boosting.hpp"
 
+#include <fstream>
+
 namespace LightGBM {
 
 SerialTreeLearner::SerialTreeLearner(const Config* config)
@@ -798,14 +800,46 @@ void SerialTreeLearner::SplitInner(Tree* tree, int best_leaf, int* left_leaf,
   *left_leaf = best_leaf;
   auto next_leaf_id = tree->NextLeafId();
 
-  // const int64_t left_sum_grad_hess = best_split_info.left_sum_gradient_and_hessian;
-  // const int64_t right_sum_grad_hess = best_split_info.right_sum_gradient_and_hessian;
-  // const int32_t left_sum_grad = static_cast<int32_t>(left_sum_grad_hess >> 32);
-  // const uint32_t left_sum_hess = static_cast<uint32_t>(left_sum_grad_hess & 0x00000000ffffffff);
-  // const int32_t right_sum_grad = static_cast<int32_t>(right_sum_grad_hess >> 32);
-  // const uint32_t right_sum_hess = static_cast<uint32_t>(right_sum_grad_hess & 0x00000000ffffffff);
-  // Log::Warning("leaf_id = %d, feature_index = %d, left_sum_grad = %d, left_sum_hess = %d, right_sum_grad = %d, right_sum_hess = %d",
-  //   best_leaf, best_split_info.feature, left_sum_grad, left_sum_hess, right_sum_grad, right_sum_hess);
+  const int64_t left_sum_grad_hess = best_split_info.left_sum_gradient_and_hessian;
+  const int64_t right_sum_grad_hess = best_split_info.right_sum_gradient_and_hessian;
+  const int32_t left_sum_grad = static_cast<int32_t>(left_sum_grad_hess >> 32);
+  const uint32_t left_sum_hess = static_cast<uint32_t>(left_sum_grad_hess & 0x00000000ffffffff);
+  const int32_t right_sum_grad = static_cast<int32_t>(right_sum_grad_hess >> 32);
+  const uint32_t right_sum_hess = static_cast<uint32_t>(right_sum_grad_hess & 0x00000000ffffffff);
+  const BinMapper* bin_mapper = train_data_->FeatureBinMapper(train_data_->InnerFeatureIndex(best_split_info.feature));
+  const MissingType missing_type = bin_mapper->missing_type();
+  Log::Warning("leaf_id = %d, feature_index = %d, left_sum_grad = %d, left_sum_hess = %d, right_sum_grad = %d, right_sum_hess = %d, missing_type = %d",
+    best_leaf, best_split_info.feature, left_sum_grad, left_sum_hess, right_sum_grad, right_sum_hess, missing_type);
+
+  const int32_t* smaller_ptr = reinterpret_cast<const int32_t*>(smaller_leaf_histogram_array_[train_data_->InnerFeatureIndex(best_split_info.feature)].RawData());
+  const int offset = static_cast<int>(bin_mapper->GetMostFreqBin() == 0);
+  int64_t smaller_sum_grad_in_hist = 0, smaller_sum_hess_in_hist = 0;
+  int64_t smaller_sum_grad_in_hist_left = 0, smaller_sum_hess_in_hist_left = 0;
+  for (int i = 0; i < bin_mapper->num_bin() - offset; ++i) {
+    smaller_sum_grad_in_hist += smaller_ptr[2 * i + 1];
+    smaller_sum_hess_in_hist += static_cast<uint32_t>(smaller_ptr[2 * i]);
+    if (static_cast<uint32_t>(i + offset) <= best_split_info.threshold) {
+      smaller_sum_grad_in_hist_left += smaller_ptr[2 * i + 1];
+      smaller_sum_hess_in_hist_left += smaller_ptr[2 * i];
+    }
+    Log::Warning("bin %d, grad %ld, hess %ld", i, smaller_ptr[2 * i + 1], smaller_ptr[2 * i]);
+  }
+
+  Log::Warning("smaller_sum_grad_in_hist = %ld, smaller_sum_hess_in_hist = %ld",
+    smaller_sum_grad_in_hist, smaller_sum_hess_in_hist);
+  Log::Warning("smaller_sum_grad_in_hist_left = %ld, smaller_sum_hess_in_hist_left = %ld most_freq_bin = %d",
+    smaller_sum_grad_in_hist_left, smaller_sum_hess_in_hist_left, bin_mapper->GetMostFreqBin());
+
+  if (larger_leaf_histogram_array_ != nullptr) {
+    const int32_t* larger_ptr = reinterpret_cast<const int32_t*>(larger_leaf_histogram_array_[train_data_->InnerFeatureIndex(best_split_info.feature)].RawData());
+    int64_t larger_sum_grad_in_hist = 0, larger_sum_hess_in_hist = 0;
+    for (int i = 0; i < bin_mapper->num_bin() - offset; ++i) {
+      larger_sum_grad_in_hist += larger_ptr[2 * i + 1];
+      larger_sum_hess_in_hist += static_cast<uint32_t>(larger_ptr[2 * i]);
+    }
+    Log::Warning("larger_sum_grad_in_hist = %ld, larger_sum_hess_in_hist = %ld",
+      larger_sum_grad_in_hist, larger_sum_hess_in_hist);
+  }
 
   // update before tree split
   constraints_->BeforeSplit(best_leaf, next_leaf_id,
@@ -932,14 +966,89 @@ void SerialTreeLearner::SplitInner(Tree* tree, int best_leaf, int* left_leaf,
     }
   }
 
-  // int64_t grad = 0, hess = 0;
-  // get_grad_hess2<int64_t, 32>(smaller_leaf_splits_->int_sum_gradients_and_hessians(), &grad, &hess);
-  // Log::Warning("smaller_leaf_splits_->int_sum_gradients_and_hessians() = %ld, grad = %ld, hess = %ld",
-  //   smaller_leaf_splits_->int_sum_gradients_and_hessians(), grad, hess);
-  // get_grad_hess2<int64_t, 32>(larger_leaf_splits_->int_sum_gradients_and_hessians(), &grad, &hess);
-  // Log::Warning("larger_leaf_splits_->int_sum_gradients_and_hessians() = %ld, grad = %ld, hess = %ld",
-  //   larger_leaf_splits_->int_sum_gradients_and_hessians(), grad, hess);
+  int64_t left_grad = 0, left_hess = 0, right_grad = 0, right_hess = 0;
+  get_grad_hess2<int64_t, 32>(smaller_leaf_splits_->int_sum_gradients_and_hessians(), &left_grad, &left_hess);
+  Log::Warning("smaller_leaf_splits_->int_sum_gradients_and_hessians() = %ld, grad = %ld, hess = %ld",
+    smaller_leaf_splits_->int_sum_gradients_and_hessians(), left_grad, left_hess);
+  get_grad_hess2<int64_t, 32>(larger_leaf_splits_->int_sum_gradients_and_hessians(), &right_grad, &right_hess);
+  Log::Warning("larger_leaf_splits_->int_sum_gradients_and_hessians() = %ld, grad = %ld, hess = %ld",
+    larger_leaf_splits_->int_sum_gradients_and_hessians(), right_grad, right_hess);
   SetNumBitsInHistogramBin(*left_leaf, *right_leaf);
+
+  {
+    std::ofstream fout("split_bin_2_list.txt");
+    const uint32_t threshold = best_split_info.threshold;
+    BinIterator* iter = train_data_->FeatureIterator(train_data_->InnerFeatureIndex(best_split_info.feature));
+    const int8_t* grad_and_hess = reinterpret_cast<const int8_t*>(gradient_discretizer_->discretized_gradients_and_hessians());
+    int64_t left_sum_grad = 0, left_sum_hess = 0, right_sum_grad = 0, right_sum_hess = 0;
+    data_size_t num_data = 0;
+    iter->Reset(0);
+    Log::Warning("step 0");
+    const data_size_t* data_indices_in_left = data_partition_->GetIndexOnLeaf(smaller_leaf_splits_->leaf_index(), &num_data);
+    std::vector<int64_t> grad_hist(15, 0), hess_hist(15, 0), cnt_hist(15, 0);
+    for (data_size_t i = 0; i < num_data_; ++i) {
+      const uint32_t bin = iter->Get(i);
+      if (bin == 2) {
+        fout << i << std::endl;
+      }
+    }
+    iter->Reset(0);
+    for (data_size_t i = 0; i < num_data; ++i) {
+      const data_size_t index = data_indices_in_left[i];
+      left_sum_grad += grad_and_hess[(index << 1) + 1];
+      left_sum_hess += grad_and_hess[(index << 1)];
+      const uint32_t bin = iter->Get(index);
+      if (smaller_leaf_splits_->leaf_index() < larger_leaf_splits_->leaf_index()) {
+        CHECK_LE(bin, threshold);
+      } else {
+        CHECK_GT(bin, threshold);
+      }
+      grad_hist[bin] += grad_and_hess[(index << 1) + 1];
+      hess_hist[bin] += grad_and_hess[(index << 1)];
+      cnt_hist[bin] += 1;
+    }
+    for (size_t i = 0; i < grad_hist.size(); ++i) {
+      Log::Warning("left grad_hist[%d] = %d, hess_hist[%d] = %d, cnt_hist[%d] = %d", i, grad_hist[i], i, hess_hist[i], i, cnt_hist[i]);
+    }
+    Log::Warning("step 1");
+    Log::Warning("calculated left_sum_grad = %ld, left_sum_hess = %d", left_sum_grad, left_sum_hess);
+    if (left_grad != left_sum_grad || left_hess != left_sum_hess) {
+      Log::Warning("error !!! left_grad = %ld, left_hess = %ld", left_grad, left_hess);
+      Log::Warning("error !!! left_sum_grad = %ld, left_sum_hess = %ld", left_sum_grad, left_sum_hess);
+    }
+    Log::Warning("step 2");
+    if (larger_leaf_splits_->leaf_index() >= 0) {
+      const data_size_t* data_indices_in_right = data_partition_->GetIndexOnLeaf(larger_leaf_splits_->leaf_index(), &num_data);
+      Log::Warning("step 3");
+      iter->Reset(0);
+      std::vector<int64_t> grad_hist(15, 0), hess_hist(15, 0), cnt_hist(15, 0);
+      for (data_size_t i = 0; i < num_data; ++i) {
+        const data_size_t index = data_indices_in_right[i];
+        right_sum_grad += grad_and_hess[(index << 1) + 1];
+        right_sum_hess += grad_and_hess[(index << 1)];
+        const uint32_t bin = iter->Get(index);
+        if (smaller_leaf_splits_->leaf_index() < larger_leaf_splits_->leaf_index()) {
+          CHECK_GT(bin, threshold);
+        } else {
+          CHECK_LE(bin, threshold);
+        }
+        grad_hist[bin] += grad_and_hess[(index << 1) + 1];
+        hess_hist[bin] += grad_and_hess[(index << 1)];
+        cnt_hist[bin] += 1;
+      }
+      for (size_t i = 0; i < grad_hist.size(); ++i) {
+        Log::Warning("right grad_hist[%d] = %d, hess_hist[%d] = %d, cnt_hist[%d] = %d", i, grad_hist[i], i, hess_hist[i], i, cnt_hist[i]);
+      }
+      Log::Warning("step 4");
+      Log::Warning("calculated right_sum_grad = %ld, right_sum_hess = %d", right_sum_grad, right_sum_hess);
+      if (right_grad != right_sum_grad || right_hess != right_sum_hess) {
+        Log::Warning("error !!! right_grad = %ld, right_hess = %ld", right_grad, right_hess);
+        Log::Warning("error !!! right_sum_grad = %ld, right_sum_hess = %ld", right_sum_grad, right_sum_hess);
+      }
+      Log::Warning("step 5");
+    }
+  }
+
   auto leaves_need_update = constraints_->Update(
       is_numerical_split, *left_leaf, *right_leaf,
       best_split_info.monotone_type, best_split_info.right_output,
@@ -1122,11 +1231,11 @@ void SerialTreeLearner::RenewIntGradTreeOutput(Tree* tree) const {
 
 void SerialTreeLearner::SetNumBitsInHistogramBin(const int left_leaf_index, const int right_leaf_index) {
   if (right_leaf_index == -1) {
-    if (!config_->use_discretized_grad) {
+    //if (!config_->use_discretized_grad) {
       leaf_num_bits_in_histogram_bin_[left_leaf_index] = 32;
       leaf_num_bits_in_histogram_acc_[left_leaf_index] = 32;
       return;
-    }
+    //}
     const data_size_t num_data_in_left_leaf = GetGlobalDataCountInLeaf(left_leaf_index);
     const uint64_t max_stat = static_cast<uint64_t>(num_data_in_left_leaf) * static_cast<uint64_t>(config_->grad_discretize_bins);
     const uint64_t max_stat_per_bin = static_cast<uint64_t>(num_data_in_left_leaf) * static_cast<uint64_t>(config_->grad_discretize_bins)
@@ -1146,7 +1255,7 @@ void SerialTreeLearner::SetNumBitsInHistogramBin(const int left_leaf_index, cons
       leaf_num_bits_in_histogram_acc_[left_leaf_index] = 32;
     }
   } else {
-    if (!config_->use_discretized_grad) {
+    //if (!config_->use_discretized_grad) {
       node_num_bits_in_histogram_bin_[left_leaf_index] = 32;
       leaf_num_bits_in_histogram_bin_[left_leaf_index] = 32;
       leaf_num_bits_in_histogram_bin_[right_leaf_index] = 32;
@@ -1154,7 +1263,7 @@ void SerialTreeLearner::SetNumBitsInHistogramBin(const int left_leaf_index, cons
       leaf_num_bits_in_histogram_acc_[left_leaf_index] = 32;
       leaf_num_bits_in_histogram_acc_[right_leaf_index] = 32;
       return;
-    }
+    //}
     const data_size_t num_data_in_left_leaf =
       smaller_leaf_splits_->leaf_index() == left_leaf_index ?
         GetGlobalDataCountInLeaf(smaller_leaf_splits_->leaf_index()) :

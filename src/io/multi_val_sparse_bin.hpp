@@ -14,6 +14,8 @@
 #include <cstring>
 #include <vector>
 
+#include <fstream>
+
 namespace LightGBM {
 
 template <typename INDEX_T, typename VAL_T>
@@ -184,11 +186,14 @@ class MultiValSparseBin : public MultiValBin {
   void ConstructHistogramIntInner(const data_size_t* data_indices,
                                data_size_t start, data_size_t end,
                                const score_t* gradients_and_hessians, hist_t* out) const {
+    Log::Warning("constructing multi val sparse bin !!!");
     data_size_t i = start;
     PACKED_HIST_T* out_ptr = reinterpret_cast<PACKED_HIST_T*>(out);
     const int16_t* gradients_and_hessians_ptr = reinterpret_cast<const int16_t*>(gradients_and_hessians);
     const VAL_T* data_ptr = data_.data();
     const INDEX_T* row_ptr_base = row_ptr_.data();
+    std::ofstream fout("construct_hist_bin_2_id.txt");
+    std::vector<int64_t> grads_local(15, 0), hesss_local(15, 0), cnt_local(15, 0);
     if (USE_PREFETCH) {
       const data_size_t pf_offset = 32 / sizeof(VAL_T);
       const data_size_t pf_end = end - pf_offset;
@@ -211,6 +216,14 @@ class MultiValSparseBin : public MultiValBin {
         for (auto j = j_start; j < j_end; ++j) {
           const auto ti = static_cast<uint32_t>(data_ptr[j]);
           out_ptr[ti] += gradient_packed;
+          if (ti >= 7968 && ti < 7983) {
+            grads_local[ti - 7968] += static_cast<int64_t>(static_cast<int8_t>(gradient_16 >> 8));
+            hesss_local[ti - 7968] += static_cast<int64_t>(static_cast<int8_t>(gradient_16 & 0xff));
+            cnt_local[ti - 7968] += 1;
+            if (ti == 7970) {
+              fout << idx << std::endl;
+            }
+          }
         }
       }
     }
@@ -225,8 +238,20 @@ class MultiValSparseBin : public MultiValBin {
       for (auto j = j_start; j < j_end; ++j) {
         const auto ti = static_cast<uint32_t>(data_ptr[j]);
         out_ptr[ti] += gradient_packed;
+        if (ti >= 7968 && ti < 7983) {
+          grads_local[ti - 7968] += static_cast<int64_t>(static_cast<int8_t>(gradient_16 >> 8));
+          hesss_local[ti - 7968] += static_cast<int64_t>(static_cast<int8_t>(gradient_16 & 0xff));
+          cnt_local[ti - 7968] += 1;
+          if (ti == 7970) {
+            fout << idx << std::endl;
+          }
+        }
       }
     }
+    for (size_t i = 0; i < grads_local.size(); ++i) {
+      Log::Warning("local hist bin %d grad %ld hess %ld cnt %ld", i, grads_local[i], hesss_local[i], cnt_local[i]);
+    }
+    fout.close();
   }
 
   void ConstructHistogramInt32(const data_size_t* data_indices, data_size_t start,
