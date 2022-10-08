@@ -63,7 +63,7 @@ class MultiValBinWrapper {
       Threading::BlockInfo<data_size_t>(num_threads_, num_data, min_block_size_,
                                         &n_data_block_, &data_block_size_);
       ResizeHistBuf(hist_buf, cur_multi_val_bin, origin_hist_data);
-      const int inner_hist_bits = (data_block_size_ * grad_discretize_bins_ / per_bin_div_ <= 256 && HIST_BITS == 16) ? 8 : HIST_BITS;
+      const int inner_hist_bits = (data_block_size_ * grad_discretize_bins_ / per_bin_div_ < 256 && HIST_BITS == 16) ? 8 : HIST_BITS;
       OMP_INIT_EX();
       #pragma omp parallel for schedule(static) num_threads(num_threads_)
       for (int block_id = 0; block_id < n_data_block_; ++block_id) {
