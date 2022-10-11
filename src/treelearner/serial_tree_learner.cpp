@@ -255,8 +255,10 @@ Tree* SerialTreeLearner::Train(const score_t* gradients, const score_t *hessians
     cur_depth = std::max(cur_depth, tree->leaf_depth(left_leaf));
   }
 
-  if (config_->discretized_grad_renew) {
+  if (config_->discretized_grad_renew && config_->use_discretized_grad) {
+    global_timer.Start("SerialTreeLearner::RenewIntGradTreeOutput");
     RenewIntGradTreeOutput(tree.get());
+    global_timer.Stop("SerialTreeLearner::RenewIntGradTreeOutput");
   }
 
   Log::Debug("Trained a tree with leaves = %d and depth = %d", tree->num_leaves(), cur_depth);
