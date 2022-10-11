@@ -75,6 +75,10 @@ void SerialTreeLearner::Init(const Dataset* train_data, bool is_constant_hessian
     leaf_num_bits_in_histogram_acc_.resize(config_->num_leaves, 0);
     node_num_bits_in_histogram_bin_.resize(config_->num_leaves, 0);
     node_num_bits_in_histogram_acc_.resize(config_->num_leaves, 0);
+    global_leaf_num_bits_in_histogram_bin_.resize(config_->num_leaves, 0);
+    global_leaf_num_bits_in_histogram_acc_.resize(config_->num_leaves, 0);
+    global_node_num_bits_in_histogram_bin_.resize(config_->num_leaves, 0);
+    global_node_num_bits_in_histogram_acc_.resize(config_->num_leaves, 0);
     gradient_discretizer_.reset(new GradientDiscretizer(config_->grad_discretize_bins, config_->num_iterations, config_->seed, false, is_constant_hessian, config_->stochastic_rounding));
     gradient_discretizer_->Init(num_data_);
     ordered_int_gradients_and_hessians_.resize(2 * num_data_);
@@ -88,6 +92,9 @@ void SerialTreeLearner::Init(const Dataset* train_data, bool is_constant_hessian
       const BinMapper* bin_mapper = train_data_->FeatureBinMapper(feature_index);
       change_hist_bits_buffer_[feature_index].resize((bin_mapper->num_bin() - static_cast<int>(bin_mapper->GetMostFreqBin() == 0)) * 2);
     }
+  }
+  if (config_->tree_learner == std::string("data")) {
+    leaf_grad_hess_stats_.resize(2 * config_->num_leaves);
   }
 }
 
@@ -348,7 +355,17 @@ void SerialTreeLearner::BeforeTrain() {
   leaf_num_bits_in_histogram_acc_.resize(config_->num_leaves, 0);
   node_num_bits_in_histogram_bin_.resize(config_->num_leaves, 0);
   node_num_bits_in_histogram_acc_.resize(config_->num_leaves, 0);
-  SetNumBitsInHistogramBin(0, -1);
+  global_leaf_num_bits_in_histogram_bin_.clear();
+  global_leaf_num_bits_in_histogram_acc_.clear();
+  global_node_num_bits_in_histogram_bin_.clear();
+  global_node_num_bits_in_histogram_acc_.clear();
+  global_leaf_num_bits_in_histogram_bin_.resize(config_->num_leaves, 0);
+  global_leaf_num_bits_in_histogram_acc_.resize(config_->num_leaves, 0);
+  global_node_num_bits_in_histogram_bin_.resize(config_->num_leaves, 0);
+  global_node_num_bits_in_histogram_acc_.resize(config_->num_leaves, 0);
+  if (config_->tree_learner != std::string("data")) {
+    SetNumBitsInHistogramBin(0, -1);
+  }
 }
 
 bool SerialTreeLearner::BeforeFindBestSplit(const Tree* tree, int left_leaf, int right_leaf) {
@@ -902,7 +919,9 @@ void SerialTreeLearner::SplitInner(Tree* tree, int best_leaf, int* left_leaf,
                                 best_split_info.left_output);
     }
   }
-  SetNumBitsInHistogramBin(*left_leaf, *right_leaf);
+  if (config_->tree_learner != std::string("data")) {
+    SetNumBitsInHistogramBin(*left_leaf, *right_leaf);
+  }
   auto leaves_need_update = constraints_->Update(
       is_numerical_split, *left_leaf, *right_leaf,
       best_split_info.monotone_type, best_split_info.right_output,
@@ -967,8 +986,8 @@ void SerialTreeLearner::ComputeBestSplitForFeature(
   }
   SplitInfo new_split;
   if (config_->use_discretized_grad) {
-    const uint8_t hist_bits_bin = leaf_num_bits_in_histogram_bin_[leaf_splits->leaf_index()];
-    const uint8_t hist_bits_acc = leaf_num_bits_in_histogram_acc_[leaf_splits->leaf_index()];
+    const uint8_t hist_bits_bin = global_leaf_num_bits_in_histogram_bin_[leaf_splits->leaf_index()];
+    const uint8_t hist_bits_acc = global_leaf_num_bits_in_histogram_acc_[leaf_splits->leaf_index()];
     histogram_array_[feature_index].FindBestThresholdInt(
         leaf_splits->int_sum_gradients_and_hessians(),
         *gradient_discretizer_->grad_scale(),
@@ -1063,106 +1082,148 @@ std::vector<int8_t> node_used_features = col_sampler_.GetByNode(tree, leaf);
 
 // TODO(shiyu1994): check various restrictions are effective in renew
 // TODO(shiyu1994): accelerate with existing gradient information
-void SerialTreeLearner::RenewIntGradTreeOutput(Tree* tree) const {
-  for (int leaf_id = 0; leaf_id < tree->num_leaves(); ++leaf_id) {
-    data_size_t leaf_cnt = 0;
-    const data_size_t* data_indices = data_partition_->GetIndexOnLeaf(leaf_id, &leaf_cnt);
-    double sum_gradient = 0.0f, sum_hessian = 0.0f;
-    #pragma omp parallel for schedule(static) reduction(+:sum_gradient, sum_hessian)
-    for (data_size_t i = 0; i < leaf_cnt; ++i) {
-      const data_size_t index = data_indices[i];
-      const score_t grad = gradients_[index];
-      const score_t hess = hessians_[index];
-      sum_gradient += grad;
-      sum_hessian += hess;
+void SerialTreeLearner::RenewIntGradTreeOutput(Tree* tree) {
+  if (config_->tree_learner == std::string("data")) {
+    for (int leaf_id = 0; leaf_id < tree->num_leaves(); ++leaf_id) {
+      data_size_t leaf_cnt = 0;
+      const data_size_t* data_indices = data_partition_->GetIndexOnLeaf(leaf_id, &leaf_cnt);
+      double sum_gradient = 0.0f, sum_hessian = 0.0f;
+      #pragma omp parallel for schedule(static) reduction(+:sum_gradient, sum_hessian)
+      for (data_size_t i = 0; i < leaf_cnt; ++i) {
+        const data_size_t index = data_indices[i];
+        const score_t grad = gradients_[index];
+        const score_t hess = hessians_[index];
+        sum_gradient += grad;
+        sum_hessian += hess;
+      }
+      leaf_grad_hess_stats_[2 * leaf_id] = sum_gradient;
+      leaf_grad_hess_stats_[2 * leaf_id + 1] = sum_hessian;
     }
-    const double leaf_output = FeatureHistogram::CalculateSplittedLeafOutput<true, true, false>(sum_gradient, sum_hessian, 
-      config_->lambda_l1, config_->lambda_l2, config_->max_delta_step, config_->path_smooth,
-      leaf_cnt, 0.0f);
-    tree->SetLeafOutput(leaf_id, leaf_output);
+    std::vector<double> global_leaf_grad_hess_stats = Network::GlobalSum<double>(&leaf_grad_hess_stats_);
+    for (int leaf_id = 0; leaf_id < tree->num_leaves(); ++leaf_id) {
+      const double sum_gradient = global_leaf_grad_hess_stats[2 * leaf_id];
+      const double sum_hessian = global_leaf_grad_hess_stats[2 * leaf_id + 1];
+      const double leaf_output = FeatureHistogram::CalculateSplittedLeafOutput<true, true, false>(
+        sum_gradient, sum_hessian, 
+        config_->lambda_l1, config_->lambda_l2, config_->max_delta_step, config_->path_smooth,
+        GetGlobalDataCountInLeaf(leaf_id), 0.0f);
+      tree->SetLeafOutput(leaf_id, leaf_output);
+    }
+  } else {
+    for (int leaf_id = 0; leaf_id < tree->num_leaves(); ++leaf_id) {
+      data_size_t leaf_cnt = 0;
+      const data_size_t* data_indices = data_partition_->GetIndexOnLeaf(leaf_id, &leaf_cnt);
+      double sum_gradient = 0.0f, sum_hessian = 0.0f;
+      #pragma omp parallel for schedule(static) reduction(+:sum_gradient, sum_hessian)
+      for (data_size_t i = 0; i < leaf_cnt; ++i) {
+        const data_size_t index = data_indices[i];
+        const score_t grad = gradients_[index];
+        const score_t hess = hessians_[index];
+        sum_gradient += grad;
+        sum_hessian += hess;
+      }
+      const double leaf_output = FeatureHistogram::CalculateSplittedLeafOutput<true, true, false>(sum_gradient, sum_hessian, 
+        config_->lambda_l1, config_->lambda_l2, config_->max_delta_step, config_->path_smooth,
+        leaf_cnt, 0.0f);
+      tree->SetLeafOutput(leaf_id, leaf_output);
+    }
   }
 }
 
-void SerialTreeLearner::SetNumBitsInHistogramBin(const int left_leaf_index, const int right_leaf_index) {
+template <bool IS_GLOBAL>
+void SerialTreeLearner::SetNumBitsInHistogramBinInner(const int left_leaf_index, const int right_leaf_index) {
+  std::vector<uint8_t>& leaf_num_bits_in_histogram_bin = IS_GLOBAL ?
+    global_leaf_num_bits_in_histogram_bin_ : leaf_num_bits_in_histogram_bin_;
+  std::vector<uint8_t>& leaf_num_bits_in_histogram_acc = IS_GLOBAL ?
+    global_leaf_num_bits_in_histogram_acc_ : leaf_num_bits_in_histogram_acc_;
+  std::vector<int8_t>& node_num_bits_in_histogram_bin = IS_GLOBAL ?
+    global_node_num_bits_in_histogram_bin_ : node_num_bits_in_histogram_bin_;
+  std::vector<int8_t>& node_num_bits_in_histogram_acc = IS_GLOBAL ?
+    global_node_num_bits_in_histogram_acc_ : node_num_bits_in_histogram_acc_;
   if (right_leaf_index == -1) {
     if (!config_->use_discretized_grad) {
-      leaf_num_bits_in_histogram_bin_[left_leaf_index] = 32;
-      leaf_num_bits_in_histogram_acc_[left_leaf_index] = 32;
+      leaf_num_bits_in_histogram_bin[left_leaf_index] = 32;
+      leaf_num_bits_in_histogram_acc[left_leaf_index] = 32;
       return;
     }
-    const data_size_t num_data_in_left_leaf = GetGlobalDataCountInLeaf(left_leaf_index);
+    const data_size_t num_data_in_left_leaf = IS_GLOBAL ? GetGlobalDataCountInLeaf(left_leaf_index) :
+      data_partition_->leaf_count(left_leaf_index);
     const uint64_t max_stat = static_cast<uint64_t>(num_data_in_left_leaf) * static_cast<uint64_t>(config_->grad_discretize_bins);
     const uint64_t max_stat_per_bin = static_cast<uint64_t>(num_data_in_left_leaf) * static_cast<uint64_t>(config_->grad_discretize_bins)
       / static_cast<uint64_t>(config_->per_bin_div);
     if (max_stat_per_bin < 256) {
-      leaf_num_bits_in_histogram_bin_[left_leaf_index] = 8;
+      leaf_num_bits_in_histogram_bin[left_leaf_index] = 8;
     } else if (max_stat_per_bin < 65536) {
-      leaf_num_bits_in_histogram_bin_[left_leaf_index] = 16;
+      leaf_num_bits_in_histogram_bin[left_leaf_index] = 16;
     } else {
-      leaf_num_bits_in_histogram_bin_[left_leaf_index] = 32;
+      leaf_num_bits_in_histogram_bin[left_leaf_index] = 32;
     }
     if (max_stat < 256) {
-      leaf_num_bits_in_histogram_acc_[left_leaf_index] = 8;
+      leaf_num_bits_in_histogram_acc[left_leaf_index] = 8;
     } else if (max_stat < 65536) {
-      leaf_num_bits_in_histogram_acc_[left_leaf_index] = 16;
+      leaf_num_bits_in_histogram_acc[left_leaf_index] = 16;
     } else {
-      leaf_num_bits_in_histogram_acc_[left_leaf_index] = 32;
+      leaf_num_bits_in_histogram_acc[left_leaf_index] = 32;
     }
   } else {
     if (!config_->use_discretized_grad) {
-      node_num_bits_in_histogram_bin_[left_leaf_index] = 32;
-      leaf_num_bits_in_histogram_bin_[left_leaf_index] = 32;
-      leaf_num_bits_in_histogram_bin_[right_leaf_index] = 32;
-      node_num_bits_in_histogram_acc_[left_leaf_index] = 32;
-      leaf_num_bits_in_histogram_acc_[left_leaf_index] = 32;
-      leaf_num_bits_in_histogram_acc_[right_leaf_index] = 32;
+      node_num_bits_in_histogram_bin[left_leaf_index] = 32;
+      leaf_num_bits_in_histogram_bin[left_leaf_index] = 32;
+      leaf_num_bits_in_histogram_bin[right_leaf_index] = 32;
+      node_num_bits_in_histogram_acc[left_leaf_index] = 32;
+      leaf_num_bits_in_histogram_acc[left_leaf_index] = 32;
+      leaf_num_bits_in_histogram_acc[right_leaf_index] = 32;
       return;
     }
     const data_size_t num_data_in_left_leaf =
-      smaller_leaf_splits_->leaf_index() == left_leaf_index ?
-        GetGlobalDataCountInLeaf(smaller_leaf_splits_->leaf_index()) :
-        GetGlobalDataCountInLeaf(larger_leaf_splits_->leaf_index());
+        IS_GLOBAL ? GetGlobalDataCountInLeaf(left_leaf_index) : data_partition_->leaf_count(left_leaf_index);
     const data_size_t num_data_in_right_leaf =
-      smaller_leaf_splits_->leaf_index() == left_leaf_index ?
-        GetGlobalDataCountInLeaf(larger_leaf_splits_->leaf_index()) :
-        GetGlobalDataCountInLeaf(smaller_leaf_splits_->leaf_index());
+        IS_GLOBAL ? GetGlobalDataCountInLeaf(right_leaf_index) : data_partition_->leaf_count(right_leaf_index);
     const uint64_t max_stat_left = static_cast<uint64_t>(num_data_in_left_leaf) * static_cast<uint64_t>(config_->grad_discretize_bins);
     const uint64_t max_stat_right = static_cast<uint64_t>(num_data_in_right_leaf) * static_cast<uint64_t>(config_->grad_discretize_bins);
     const uint64_t max_stat_left_per_bin = static_cast<uint64_t>(num_data_in_left_leaf) * static_cast<uint64_t>(config_->grad_discretize_bins) /
       static_cast<uint64_t>(config_->per_bin_div);
     const uint64_t max_stat_right_per_bin = static_cast<uint64_t>(num_data_in_right_leaf) * static_cast<uint64_t>(config_->grad_discretize_bins) /
       static_cast<uint64_t>(config_->per_bin_div);
-    node_num_bits_in_histogram_bin_[left_leaf_index] = leaf_num_bits_in_histogram_bin_[left_leaf_index];
-    node_num_bits_in_histogram_acc_[left_leaf_index] = leaf_num_bits_in_histogram_acc_[left_leaf_index];
+    node_num_bits_in_histogram_bin[left_leaf_index] = leaf_num_bits_in_histogram_bin[left_leaf_index];
+    node_num_bits_in_histogram_acc[left_leaf_index] = leaf_num_bits_in_histogram_acc[left_leaf_index];
     if (max_stat_left_per_bin < 256) {
-      leaf_num_bits_in_histogram_bin_[left_leaf_index] = 8;
+      leaf_num_bits_in_histogram_bin[left_leaf_index] = 8;
     } else if (max_stat_left_per_bin < 65536) {
-      leaf_num_bits_in_histogram_bin_[left_leaf_index] = 16;
+      leaf_num_bits_in_histogram_bin[left_leaf_index] = 16;
     } else {
-      leaf_num_bits_in_histogram_bin_[left_leaf_index] = 32;
+      leaf_num_bits_in_histogram_bin[left_leaf_index] = 32;
     }
     if (max_stat_right_per_bin < 256) {
-      leaf_num_bits_in_histogram_bin_[right_leaf_index] = 8;
+      leaf_num_bits_in_histogram_bin[right_leaf_index] = 8;
     } else if (max_stat_right_per_bin < 65536) {
-      leaf_num_bits_in_histogram_bin_[right_leaf_index] = 16;
+      leaf_num_bits_in_histogram_bin[right_leaf_index] = 16;
     } else {
-      leaf_num_bits_in_histogram_bin_[right_leaf_index] = 32;
+      leaf_num_bits_in_histogram_bin[right_leaf_index] = 32;
     }
     if (max_stat_left < 256) {
-      leaf_num_bits_in_histogram_acc_[left_leaf_index] = 8;
+      leaf_num_bits_in_histogram_acc[left_leaf_index] = 8;
     } else if (max_stat_left < 65536) {
-      leaf_num_bits_in_histogram_acc_[left_leaf_index] = 16;
+      leaf_num_bits_in_histogram_acc[left_leaf_index] = 16;
     } else {
-      leaf_num_bits_in_histogram_acc_[left_leaf_index] = 32;
+      leaf_num_bits_in_histogram_acc[left_leaf_index] = 32;
     }
     if (max_stat_right < 256) {
-      leaf_num_bits_in_histogram_acc_[right_leaf_index] = 8;
+      leaf_num_bits_in_histogram_acc[right_leaf_index] = 8;
     } else if (max_stat_right < 65536) {
-      leaf_num_bits_in_histogram_acc_[right_leaf_index] = 16;
+      leaf_num_bits_in_histogram_acc[right_leaf_index] = 16;
     } else {
-      leaf_num_bits_in_histogram_acc_[right_leaf_index] = 32;
+      leaf_num_bits_in_histogram_acc[right_leaf_index] = 32;
     }
   }
+}
+
+template void SerialTreeLearner::SetNumBitsInHistogramBinInner<false>(const int left_leaf_index, const int right_leaf_index);
+template void SerialTreeLearner::SetNumBitsInHistogramBinInner<true>(const int left_leaf_index, const int right_leaf_index);
+
+void SerialTreeLearner::SetNumBitsInHistogramBin(const int left_leaf_index, const int right_leaf_index) {
+  SetNumBitsInHistogramBinInner<false>(left_leaf_index, right_leaf_index);
+  SetNumBitsInHistogramBinInner<true>(left_leaf_index, right_leaf_index);
 }
 
 }  // namespace LightGBM

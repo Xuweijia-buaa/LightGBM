@@ -120,7 +120,7 @@ class SerialTreeLearner: public TreeLearner {
   double GetParentOutput(const Tree* tree, const LeafSplits* leaf_splits) const;
 
  protected:
-  void ComputeBestSplitForFeature(FeatureHistogram* histogram_array_,
+  void ComputeBestSplitForFeature(FeatureHistogram* histogram_array,
                                   int feature_index, int real_fidx,
                                   int8_t is_feature_used, int num_data,
                                   const LeafSplits* leaf_splits,
@@ -173,9 +173,12 @@ class SerialTreeLearner: public TreeLearner {
   */
   inline virtual data_size_t GetGlobalDataCountInLeaf(int leaf_idx) const;
 
-  void RenewIntGradTreeOutput(Tree* tree) const;
+  void RenewIntGradTreeOutput(Tree* tree);
 
-  virtual void SetNumBitsInHistogramBin(const int left_leaf_index, const int right_leaf_index);
+  void SetNumBitsInHistogramBin(const int left_leaf_index, const int right_leaf_index);
+
+  template <bool IS_GLOBAL = false>
+  void SetNumBitsInHistogramBinInner(const int left_leaf_index, const int right_leaf_index);
 
   /*! \brief number of data */
   data_size_t num_data_;
@@ -237,8 +240,14 @@ class SerialTreeLearner: public TreeLearner {
   std::vector<int8_t> node_num_bits_in_histogram_bin_;
   std::vector<uint8_t> leaf_num_bits_in_histogram_acc_;
   std::vector<int8_t> node_num_bits_in_histogram_acc_;
+  std::vector<uint8_t> global_leaf_num_bits_in_histogram_bin_;
+  std::vector<int8_t> global_node_num_bits_in_histogram_bin_;
+  std::vector<uint8_t> global_leaf_num_bits_in_histogram_acc_;
+  std::vector<int8_t> global_node_num_bits_in_histogram_acc_;
 
   std::vector<std::vector<int32_t>> change_hist_bits_buffer_;
+
+  std::vector<double> leaf_grad_hess_stats_;
 };
 
 inline data_size_t SerialTreeLearner::GetGlobalDataCountInLeaf(int leaf_idx) const {

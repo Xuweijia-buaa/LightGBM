@@ -249,7 +249,8 @@ void DataParallelTreeLearner<TREELEARNER_T>::FindBestSplits(const Tree* tree) {
   // construct local histograms
   global_timer.Start("DataParallelTreeLearner::ReduceHistogram");
   global_timer.Start("DataParallelTreeLearner::ReduceHistogram::Copy");
-  const uint8_t smaller_leaf_num_bits = this->leaf_num_bits_in_histogram_bin_[this->smaller_leaf_splits_->leaf_index()];
+  const uint8_t local_smaller_leaf_num_bits = this->leaf_num_bits_in_histogram_bin_[this->smaller_leaf_splits_->leaf_index()];
+  const uint8_t smaller_leaf_num_bits = this->global_leaf_num_bits_in_histogram_bin_[this->smaller_leaf_splits_->leaf_index()];
   #pragma omp parallel for schedule(static)
   for (int feature_index = 0; feature_index < this->num_features_; ++feature_index) {
     if (this->col_sampler_.is_feature_used_bytree()[feature_index] == false)
@@ -261,9 +262,14 @@ void DataParallelTreeLearner<TREELEARNER_T>::FindBestSplits(const Tree* tree) {
                     this->smaller_leaf_histogram_array_[feature_index].RawDataInt16(),
                     this->smaller_leaf_histogram_array_[feature_index].SizeOfInt16Histgram());
       } else {
-        std::memcpy(input_buffer_.data() + buffer_write_start_pos_[feature_index],
-                    this->smaller_leaf_histogram_array_[feature_index].RawDataInt32(),
-                    this->smaller_leaf_histogram_array_[feature_index].SizeOfInt32Histgram());
+        if (local_smaller_leaf_num_bits == 32) {
+          std::memcpy(input_buffer_.data() + buffer_write_start_pos_[feature_index],
+                      this->smaller_leaf_histogram_array_[feature_index].RawDataInt32(),
+                      this->smaller_leaf_histogram_array_[feature_index].SizeOfInt32Histgram());
+        } else {
+          this->smaller_leaf_histogram_array_[feature_index].CopyFromInt16ToInt32(
+            input_buffer_.data() + buffer_write_start_pos_[feature_index]);
+        }
       }
     } else {
       std::memcpy(input_buffer_.data() + buffer_write_start_pos_[feature_index],
@@ -298,11 +304,9 @@ void DataParallelTreeLearner<TREELEARNER_T>::FindBestSplits(const Tree* tree) {
     }
   }
   global_timer.Stop("DataParallelTreeLearner::ReduceHistogram::ReduceScatter");
-  //Log::Warning("After reduce scatter");
   global_timer.Stop("DataParallelTreeLearner::ReduceHistogram");
   this->FindBestSplitsFromHistograms(
       this->col_sampler_.is_feature_used_bytree(), true, tree);
-  //Log::Warning("After find best splits");
 }
 
 template <typename TREELEARNER_T>
@@ -315,13 +319,13 @@ void DataParallelTreeLearner<TREELEARNER_T>::FindBestSplitsFromHistograms(const 
       this->col_sampler_.GetByNode(tree, this->larger_leaf_splits_->leaf_index());
   double smaller_leaf_parent_output = this->GetParentOutput(tree, this->smaller_leaf_splits_.get());
   double larger_leaf_parent_output = this->GetParentOutput(tree, this->larger_leaf_splits_.get());
-  const uint8_t smaller_leaf_num_bits_bin = this->leaf_num_bits_in_histogram_bin_[this->smaller_leaf_splits_->leaf_index()];
-  const uint8_t smaller_leaf_num_bits_acc = this->leaf_num_bits_in_histogram_bin_[this->smaller_leaf_splits_->leaf_index()];
+  const uint8_t smaller_leaf_num_bits_bin = this->global_leaf_num_bits_in_histogram_bin_[this->smaller_leaf_splits_->leaf_index()];
+  const uint8_t smaller_leaf_num_bits_acc = this->global_leaf_num_bits_in_histogram_acc_[this->smaller_leaf_splits_->leaf_index()];
 
   if (this->larger_leaf_splits_ != nullptr && this->larger_leaf_splits_->leaf_index() >= 0) {
     const int parent_index = std::min(this->smaller_leaf_splits_->leaf_index(), this->larger_leaf_splits_->leaf_index());
-    const uint8_t parent_num_bits = this->node_num_bits_in_histogram_bin_[parent_index];
-    const uint8_t larger_leaf_num_bits = this->leaf_num_bits_in_histogram_bin_[this->larger_leaf_splits_->leaf_index()];
+    const uint8_t parent_num_bits = this->global_node_num_bits_in_histogram_bin_[parent_index];
+    const uint8_t larger_leaf_num_bits = this->global_leaf_num_bits_in_histogram_bin_[this->larger_leaf_splits_->leaf_index()];
     if (parent_num_bits > 16 && larger_leaf_num_bits <= 16) {
       CHECK_LE(smaller_leaf_num_bits_bin, 16);
       OMP_INIT_EX();
@@ -398,8 +402,8 @@ void DataParallelTreeLearner<TREELEARNER_T>::FindBestSplitsFromHistograms(const 
     // construct histgroms for large leaf, we init larger leaf as the parent, so we can just subtract the smaller leaf's histograms
     if (this->config_->use_discretized_grad) {
       const int parent_index = std::min(this->smaller_leaf_splits_->leaf_index(), this->larger_leaf_splits_->leaf_index());
-      const uint8_t parent_num_bits = this->node_num_bits_in_histogram_bin_[parent_index];
-      const uint8_t larger_leaf_num_bits = this->leaf_num_bits_in_histogram_bin_[this->larger_leaf_splits_->leaf_index()];
+      const uint8_t parent_num_bits = this->global_node_num_bits_in_histogram_bin_[parent_index];
+      const uint8_t larger_leaf_num_bits = this->global_leaf_num_bits_in_histogram_bin_[this->larger_leaf_splits_->leaf_index()];
       if (parent_num_bits <= 16) {
         CHECK_LE(smaller_leaf_num_bits_bin, 16);
         CHECK_LE(larger_leaf_num_bits, 16);

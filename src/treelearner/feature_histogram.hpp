@@ -154,6 +154,16 @@ class FeatureHistogram {
     }
   }
 
+  void CopyFromInt16ToInt32(char* buffer) {
+    const int32_t* int16_data = reinterpret_cast<const int32_t*>(RawDataInt16());
+    int64_t* int32_data = reinterpret_cast<int64_t*>(buffer);
+    for (int i = 0; i < meta_->num_bin - meta_->offset; ++i) {
+      const int32_t int16_val = int16_data[i];
+      int32_data[i] = (static_cast<int64_t>(static_cast<int16_t>(int16_val >> 16)) << 32) |
+        static_cast<int64_t>(int16_val & 0x0000ffff);
+    }
+  }
+
   void FindBestThreshold(double sum_gradient, double sum_hessian,
                          data_size_t num_data,
                          const FeatureConstraint* constraints,
