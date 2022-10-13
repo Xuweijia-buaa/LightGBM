@@ -36,7 +36,8 @@ class CUDAHistogramConstructor {
     const double min_sum_hessian_in_leaf,
     const int gpu_device_id,
     const bool gpu_use_dp,
-    const bool use_discretized_grad);
+    const bool use_discretized_grad,
+    const int grad_discretized_bins);
 
   ~CUDAHistogramConstructor();
 
@@ -177,6 +178,7 @@ class CUDAHistogramConstructor {
   const int gpu_device_id_;
   const bool gpu_use_dp_;
   const bool use_discretized_grad_;
+  const int grad_discretized_bins_;
 
   int nccl_thread_index_;
 

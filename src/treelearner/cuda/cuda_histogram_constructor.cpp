@@ -21,7 +21,8 @@ CUDAHistogramConstructor::CUDAHistogramConstructor(
   const double min_sum_hessian_in_leaf,
   const int gpu_device_id,
   const bool gpu_use_dp,
-  const bool use_discretized_grad):
+  const bool use_discretized_grad,
+  const int grad_discretized_bins):
   num_data_(train_data->num_data()),
   num_features_(train_data->num_features()),
   num_leaves_(num_leaves),
@@ -30,7 +31,8 @@ CUDAHistogramConstructor::CUDAHistogramConstructor(
   min_sum_hessian_in_leaf_(min_sum_hessian_in_leaf),
   gpu_device_id_(gpu_device_id),
   gpu_use_dp_(gpu_use_dp),
-  use_discretized_grad_(use_discretized_grad) {
+  use_discretized_grad_(use_discretized_grad),
+  grad_discretized_bins_(grad_discretized_bins) {
   InitFeatureMetaInfo(train_data, feature_hist_offsets);
   cuda_row_data_.reset(nullptr);
   cuda_feature_num_bins_ = nullptr;
@@ -170,9 +172,16 @@ void CUDAHistogramConstructor::CalcConstructHistogramKernelDim(
   const data_size_t num_data_in_smaller_leaf) {
   *block_dim_x = cuda_row_data_->max_num_column_per_partition();
   *block_dim_y = NUM_THRADS_PER_BLOCK / cuda_row_data_->max_num_column_per_partition();
-  *grid_dim_x = cuda_row_data_->num_feature_partitions();
-  *grid_dim_y = std::max(min_grid_dim_y_,
-    ((num_data_in_smaller_leaf + NUM_DATA_PER_THREAD - 1) / NUM_DATA_PER_THREAD + (*block_dim_y) - 1) / (*block_dim_y));
+  if (use_discretized_grad_) {
+    const int num_data_per_thread = std::min((65535 / grad_discretized_bins_) / (*block_dim_y), NUM_DATA_PER_THREAD);
+    *grid_dim_x = cuda_row_data_->num_feature_partitions();
+    *grid_dim_y = std::max(min_grid_dim_y_,
+      ((num_data_in_smaller_leaf + num_data_per_thread - 1) / num_data_per_thread + (*block_dim_y) - 1) / (*block_dim_y));
+  } else {
+    *grid_dim_x = cuda_row_data_->num_feature_partitions();
+    *grid_dim_y = std::max(min_grid_dim_y_,
+      ((num_data_in_smaller_leaf + NUM_DATA_PER_THREAD - 1) / NUM_DATA_PER_THREAD + (*block_dim_y) - 1) / (*block_dim_y));
+  }
 }
 
 void CUDAHistogramConstructor::ResetTrainingData(const Dataset* train_data, TrainingShareStates* share_states) {
