@@ -175,7 +175,7 @@ class SerialTreeLearner: public TreeLearner {
 
   void RenewIntGradTreeOutput(Tree* tree);
 
-  void SetNumBitsInHistogramBin(const int left_leaf_index, const int right_leaf_index);
+  virtual void SetNumBitsInHistogramBin(const int left_leaf_index, const int right_leaf_index);
 
   template <bool IS_GLOBAL = false>
   void SetNumBitsInHistogramBinInner(const int left_leaf_index, const int right_leaf_index);

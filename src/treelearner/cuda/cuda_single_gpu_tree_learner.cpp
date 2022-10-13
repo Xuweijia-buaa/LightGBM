@@ -61,7 +61,8 @@ void CUDASingleGPUTreeLearner::Init(const Dataset* train_data, bool is_constant_
 
   cuda_histogram_constructor_.reset(new CUDAHistogramConstructor(train_data_, config_->num_leaves, num_threads_,
     share_state_->feature_hist_offsets(),
-    config_->min_data_in_leaf, config_->min_sum_hessian_in_leaf, gpu_device_id_, config_->gpu_use_dp, config_->use_discretized_grad));
+    config_->min_data_in_leaf, config_->min_sum_hessian_in_leaf, gpu_device_id_, config_->gpu_use_dp,
+    config_->use_discretized_grad, config_->grad_discretize_bins));
   if (nccl_comm_ != nullptr) {
     cuda_histogram_constructor_->SetNCCL(nccl_thread_index_);
   }
@@ -403,6 +404,7 @@ Tree* CUDASingleGPUTreeLearner::Train(const score_t* gradients,
     global_timer.Stop("CUDASingleGPUTreeLearner::RenewDiscretizedTreeLeaves", nccl_thread_index_);
   }
   tree->ToHost();
+  Log::Debug("Trained a tree with leaves = %d", tree->num_leaves());
   return tree.release();
 }
 
