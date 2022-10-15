@@ -1,0 +1,30 @@
+nohup: ignoring input
+[LightGBM] [Info] Finished loading parameters
+[LightGBM] [Info] Warning: last line of mlist4.txt has no end of line, still using this line
+[LightGBM] [Info] Trying to bind port 12400...
+[LightGBM] [Info] Binding port 12400 succeeded
+[LightGBM] [Info] Listening...
+[LightGBM] [Warning] Connecting to rank 3 failed, waiting for 200 milliseconds
+[LightGBM] [Warning] Connecting to rank 3 failed, waiting for 260 milliseconds
+[LightGBM] [Warning] Connecting to rank 3 failed, waiting for 338 milliseconds
+[LightGBM] [Warning] Connecting to rank 3 failed, waiting for 439 milliseconds
+[LightGBM] [Warning] Connecting to rank 3 failed, waiting for 570 milliseconds
+[LightGBM] [Warning] Connecting to rank 3 failed, waiting for 741 milliseconds
+[LightGBM] [Warning] Connecting to rank 3 failed, waiting for 963 milliseconds
+[LightGBM] [Warning] Connecting to rank 3 failed, waiting for 1251 milliseconds
+[LightGBM] [Warning] Connecting to rank 3 failed, waiting for 1626 milliseconds
+[LightGBM] [Warning] Connecting to rank 3 failed, waiting for 2113 milliseconds
+[LightGBM] [Warning] Connecting to rank 3 failed, waiting for 2746 milliseconds
+[LightGBM] [Warning] Connecting to rank 3 failed, waiting for 3569 milliseconds
+[LightGBM] [Warning] Connecting to rank 3 failed, waiting for 4639 milliseconds
+[LightGBM] [Info] Connected to rank 1
+[LightGBM] [Info] Connected to rank 2
+[LightGBM] [Info] Connected to rank 3
+[LightGBM] [Info] Local rank: 0, total number of machines: 4
+[LightGBM] [Info] Finished initializing network
+[LightGBM] [Debug] Loading train file...
+[LightGBM] [Debug] Read 10.0 GBs from criteo.train.
+[LightGBM] [Debug] Read 20.0 GBs from criteo.train.
+[LightGBM] [Debug] Read 30.0 GBs from criteo.train.
+[LightGBM] [Info] Construct bin mappers from text data time 7.68 seconds
+[LightGBM] [Info] Making second pass...

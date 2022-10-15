@@ -1,0 +1,1592 @@
+nohup: ignoring input
+[LightGBM] [Info] Finished loading parameters
+[LightGBM] [Info] Warning: last line of mlist16.txt has no end of line, still using this line
+[LightGBM] [Info] Trying to bind port 12400...
+[LightGBM] [Info] Binding port 12400 succeeded
+[LightGBM] [Info] Listening...
+[LightGBM] [Warning] Connecting to rank 15 failed, waiting for 200 milliseconds
+[LightGBM] [Warning] Connecting to rank 15 failed, waiting for 260 milliseconds
+[LightGBM] [Warning] Connecting to rank 15 failed, waiting for 338 milliseconds
+[LightGBM] [Warning] Connecting to rank 15 failed, waiting for 439 milliseconds
+[LightGBM] [Warning] Connecting to rank 15 failed, waiting for 570 milliseconds
+[LightGBM] [Warning] Connecting to rank 15 failed, waiting for 741 milliseconds
+[LightGBM] [Warning] Connecting to rank 15 failed, waiting for 963 milliseconds
+[LightGBM] [Warning] Connecting to rank 15 failed, waiting for 1251 milliseconds
+[LightGBM] [Warning] Connecting to rank 15 failed, waiting for 1626 milliseconds
+[LightGBM] [Warning] Connecting to rank 15 failed, waiting for 2113 milliseconds
+[LightGBM] [Warning] Connecting to rank 15 failed, waiting for 2746 milliseconds
+[LightGBM] [Warning] Connecting to rank 15 failed, waiting for 3569 milliseconds
+[LightGBM] [Warning] Connecting to rank 15 failed, waiting for 4639 milliseconds
+[LightGBM] [Warning] Connecting to rank 15 failed, waiting for 6030 milliseconds
+[LightGBM] [Warning] Connecting to rank 15 failed, waiting for 7838 milliseconds
+[LightGBM] [Warning] Connecting to rank 15 failed, waiting for 10189 milliseconds
+[LightGBM] [Warning] Connecting to rank 15 failed, waiting for 13245 milliseconds
+[LightGBM] [Warning] Connecting to rank 15 failed, waiting for 17218 milliseconds
+[LightGBM] [Info] Connected to rank 1
+[LightGBM] [Info] Connected to rank 2
+[LightGBM] [Info] Connected to rank 3
+[LightGBM] [Info] Connected to rank 4
+[LightGBM] [Info] Connected to rank 5
+[LightGBM] [Info] Connected to rank 6
+[LightGBM] [Info] Connected to rank 7
+[LightGBM] [Info] Connected to rank 8
+[LightGBM] [Info] Connected to rank 9
+[LightGBM] [Info] Connected to rank 10
+[LightGBM] [Info] Connected to rank 11
+[LightGBM] [Info] Connected to rank 12
+[LightGBM] [Info] Connected to rank 13
+[LightGBM] [Info] Connected to rank 14
+[LightGBM] [Info] Connected to rank 15
+[LightGBM] [Info] Local rank: 0, total number of machines: 16
+[LightGBM] [Info] Finished initializing network
+[LightGBM] [Debug] Loading train file...
+[LightGBM] [Debug] Read 10.0 GBs from criteo.train.
+[LightGBM] [Debug] Read 20.0 GBs from criteo.train.
+[LightGBM] [Debug] Read 30.0 GBs from criteo.train.
+[LightGBM] [Info] Construct bin mappers from text data time 9.15 seconds
+[LightGBM] [Info] Making second pass...
+[LightGBM] [Debug] Read 10.0 GBs from criteo.train.
+[LightGBM] [Debug] Read 20.0 GBs from criteo.train.
+[LightGBM] [Debug] Read 30.0 GBs from criteo.train.
+[LightGBM] [Debug] Loading validation file #1...
+[LightGBM] [Info] Finished loading data in 77.669563 seconds
+[LightGBM] [Info] Number of positive: 10513211, number of negative: 30596920
+[LightGBM] [Debug] Dataset::GetMultiBinFromAllFeatures: sparse rate 0.061968
+[LightGBM] [Info] Total Bins 11424
+[LightGBM] [Info] Number of data points in the train set: 2568823, number of used features: 65
+[LightGBM] [Debug] Number of data points in validation set #1: 4584061
+[LightGBM] [Info] Finished initializing training
+[LightGBM] [Info] Started training...
+[LightGBM] [Info] [binary:BoostFromScore]: pavg=0.255733 -> initscore=-1.068267
+[LightGBM] [Info] Start training from score -1.068267
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 14
+[LightGBM] [Info] Iteration:1, valid_1 auc : 0.75841
+[LightGBM] [Info] 1.805884 seconds elapsed, finished iteration 1
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 13
+[LightGBM] [Info] Iteration:2, valid_1 auc : 0.763594
+[LightGBM] [Info] 3.710494 seconds elapsed, finished iteration 2
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 14
+[LightGBM] [Info] Iteration:3, valid_1 auc : 0.765477
+[LightGBM] [Info] 5.861457 seconds elapsed, finished iteration 3
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 13
+[LightGBM] [Info] Iteration:4, valid_1 auc : 0.766766
+[LightGBM] [Info] 7.824772 seconds elapsed, finished iteration 4
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 12
+[LightGBM] [Info] Iteration:5, valid_1 auc : 0.768039
+[LightGBM] [Info] 9.844246 seconds elapsed, finished iteration 5
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 14
+[LightGBM] [Info] Iteration:6, valid_1 auc : 0.76901
+[LightGBM] [Info] 11.852636 seconds elapsed, finished iteration 6
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 15
+[LightGBM] [Info] Iteration:7, valid_1 auc : 0.769888
+[LightGBM] [Info] 13.742968 seconds elapsed, finished iteration 7
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 15
+[LightGBM] [Info] Iteration:8, valid_1 auc : 0.770986
+[LightGBM] [Info] 15.594109 seconds elapsed, finished iteration 8
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 14
+[LightGBM] [Info] Iteration:9, valid_1 auc : 0.771757
+[LightGBM] [Info] 17.721941 seconds elapsed, finished iteration 9
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 14
+[LightGBM] [Info] Iteration:10, valid_1 auc : 0.772439
+[LightGBM] [Info] 19.528028 seconds elapsed, finished iteration 10
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 14
+[LightGBM] [Info] Iteration:11, valid_1 auc : 0.773177
+[LightGBM] [Info] 21.453023 seconds elapsed, finished iteration 11
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 15
+[LightGBM] [Info] Iteration:12, valid_1 auc : 0.773772
+[LightGBM] [Info] 23.419536 seconds elapsed, finished iteration 12
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 15
+[LightGBM] [Info] Iteration:13, valid_1 auc : 0.774401
+[LightGBM] [Info] 25.284221 seconds elapsed, finished iteration 13
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 16
+[LightGBM] [Info] Iteration:14, valid_1 auc : 0.774999
+[LightGBM] [Info] 27.204226 seconds elapsed, finished iteration 14
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 15
+[LightGBM] [Info] Iteration:15, valid_1 auc : 0.775613
+[LightGBM] [Info] 29.516331 seconds elapsed, finished iteration 15
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 16
+[LightGBM] [Info] Iteration:16, valid_1 auc : 0.776125
+[LightGBM] [Info] 31.386599 seconds elapsed, finished iteration 16
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 16
+[LightGBM] [Info] Iteration:17, valid_1 auc : 0.776694
+[LightGBM] [Info] 33.182329 seconds elapsed, finished iteration 17
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 17
+[LightGBM] [Info] Iteration:18, valid_1 auc : 0.777165
+[LightGBM] [Info] 35.303085 seconds elapsed, finished iteration 18
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 16
+[LightGBM] [Info] Iteration:19, valid_1 auc : 0.77773
+[LightGBM] [Info] 37.412120 seconds elapsed, finished iteration 19
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 15
+[LightGBM] [Info] Iteration:20, valid_1 auc : 0.778312
+[LightGBM] [Info] 39.234831 seconds elapsed, finished iteration 20
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 15
+[LightGBM] [Info] Iteration:21, valid_1 auc : 0.778819
+[LightGBM] [Info] 41.179309 seconds elapsed, finished iteration 21
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 14
+[LightGBM] [Info] Iteration:22, valid_1 auc : 0.779318
+[LightGBM] [Info] 43.191745 seconds elapsed, finished iteration 22
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 20
+[LightGBM] [Info] Iteration:23, valid_1 auc : 0.779847
+[LightGBM] [Info] 44.964104 seconds elapsed, finished iteration 23
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 16
+[LightGBM] [Info] Iteration:24, valid_1 auc : 0.78035
+[LightGBM] [Info] 46.961499 seconds elapsed, finished iteration 24
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 20
+[LightGBM] [Info] Iteration:25, valid_1 auc : 0.78077
+[LightGBM] [Info] 48.909690 seconds elapsed, finished iteration 25
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 15
+[LightGBM] [Info] Iteration:26, valid_1 auc : 0.781223
+[LightGBM] [Info] 50.929541 seconds elapsed, finished iteration 26
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 16
+[LightGBM] [Info] Iteration:27, valid_1 auc : 0.781697
+[LightGBM] [Info] 52.785783 seconds elapsed, finished iteration 27
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 18
+[LightGBM] [Info] Iteration:28, valid_1 auc : 0.78206
+[LightGBM] [Info] 54.728947 seconds elapsed, finished iteration 28
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 18
+[LightGBM] [Info] Iteration:29, valid_1 auc : 0.782404
+[LightGBM] [Info] 56.653545 seconds elapsed, finished iteration 29
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 20
+[LightGBM] [Info] Iteration:30, valid_1 auc : 0.782817
+[LightGBM] [Info] 58.839552 seconds elapsed, finished iteration 30
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 16
+[LightGBM] [Info] Iteration:31, valid_1 auc : 0.783167
+[LightGBM] [Info] 61.090180 seconds elapsed, finished iteration 31
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 18
+[LightGBM] [Info] Iteration:32, valid_1 auc : 0.783512
+[LightGBM] [Info] 63.135009 seconds elapsed, finished iteration 32
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 23
+[LightGBM] [Info] Iteration:33, valid_1 auc : 0.783854
+[LightGBM] [Info] 65.104639 seconds elapsed, finished iteration 33
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 19
+[LightGBM] [Info] Iteration:34, valid_1 auc : 0.784169
+[LightGBM] [Info] 67.221619 seconds elapsed, finished iteration 34
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 19
+[LightGBM] [Info] Iteration:35, valid_1 auc : 0.784556
+[LightGBM] [Info] 69.275403 seconds elapsed, finished iteration 35
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 21
+[LightGBM] [Info] Iteration:36, valid_1 auc : 0.784989
+[LightGBM] [Info] 71.264270 seconds elapsed, finished iteration 36
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 19
+[LightGBM] [Info] Iteration:37, valid_1 auc : 0.785269
+[LightGBM] [Info] 73.499923 seconds elapsed, finished iteration 37
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 22
+[LightGBM] [Info] Iteration:38, valid_1 auc : 0.785526
+[LightGBM] [Info] 75.621276 seconds elapsed, finished iteration 38
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 26
+[LightGBM] [Info] Iteration:39, valid_1 auc : 0.785853
+[LightGBM] [Info] 77.632395 seconds elapsed, finished iteration 39
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 16
+[LightGBM] [Info] Iteration:40, valid_1 auc : 0.786136
+[LightGBM] [Info] 79.582953 seconds elapsed, finished iteration 40
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 21
+[LightGBM] [Info] Iteration:41, valid_1 auc : 0.786469
+[LightGBM] [Info] 81.532434 seconds elapsed, finished iteration 41
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 19
+[LightGBM] [Info] Iteration:42, valid_1 auc : 0.786726
+[LightGBM] [Info] 83.388807 seconds elapsed, finished iteration 42
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 21
+[LightGBM] [Info] Iteration:43, valid_1 auc : 0.787035
+[LightGBM] [Info] 85.482144 seconds elapsed, finished iteration 43
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 19
+[LightGBM] [Info] Iteration:44, valid_1 auc : 0.78723
+[LightGBM] [Info] 87.572768 seconds elapsed, finished iteration 44
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 17
+[LightGBM] [Info] Iteration:45, valid_1 auc : 0.787445
+[LightGBM] [Info] 89.846697 seconds elapsed, finished iteration 45
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 23
+[LightGBM] [Info] Iteration:46, valid_1 auc : 0.787669
+[LightGBM] [Info] 91.759303 seconds elapsed, finished iteration 46
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 19
+[LightGBM] [Info] Iteration:47, valid_1 auc : 0.787914
+[LightGBM] [Info] 93.701255 seconds elapsed, finished iteration 47
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 21
+[LightGBM] [Info] Iteration:48, valid_1 auc : 0.788111
+[LightGBM] [Info] 95.776084 seconds elapsed, finished iteration 48
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 21
+[LightGBM] [Info] Iteration:49, valid_1 auc : 0.788357
+[LightGBM] [Info] 97.614018 seconds elapsed, finished iteration 49
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 19
+[LightGBM] [Info] Iteration:50, valid_1 auc : 0.788556
+[LightGBM] [Info] 99.592904 seconds elapsed, finished iteration 50
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 18
+[LightGBM] [Info] Iteration:51, valid_1 auc : 0.788745
+[LightGBM] [Info] 101.520590 seconds elapsed, finished iteration 51
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 19
+[LightGBM] [Info] Iteration:52, valid_1 auc : 0.788906
+[LightGBM] [Info] 103.420430 seconds elapsed, finished iteration 52
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 25
+[LightGBM] [Info] Iteration:53, valid_1 auc : 0.789228
+[LightGBM] [Info] 105.263816 seconds elapsed, finished iteration 53
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 18
+[LightGBM] [Info] Iteration:54, valid_1 auc : 0.789392
+[LightGBM] [Info] 107.501558 seconds elapsed, finished iteration 54
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 19
+[LightGBM] [Info] Iteration:55, valid_1 auc : 0.789601
+[LightGBM] [Info] 109.449612 seconds elapsed, finished iteration 55
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 20
+[LightGBM] [Info] Iteration:56, valid_1 auc : 0.789803
+[LightGBM] [Info] 111.255252 seconds elapsed, finished iteration 56
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 23
+[LightGBM] [Info] Iteration:57, valid_1 auc : 0.789945
+[LightGBM] [Info] 113.408762 seconds elapsed, finished iteration 57
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 22
+[LightGBM] [Info] Iteration:58, valid_1 auc : 0.790175
+[LightGBM] [Info] 115.668762 seconds elapsed, finished iteration 58
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 15
+[LightGBM] [Info] Iteration:59, valid_1 auc : 0.790352
+[LightGBM] [Info] 117.747212 seconds elapsed, finished iteration 59
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 18
+[LightGBM] [Info] Iteration:60, valid_1 auc : 0.79049
+[LightGBM] [Info] 119.851833 seconds elapsed, finished iteration 60
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 23
+[LightGBM] [Info] Iteration:61, valid_1 auc : 0.790631
+[LightGBM] [Info] 121.837611 seconds elapsed, finished iteration 61
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 24
+[LightGBM] [Info] Iteration:62, valid_1 auc : 0.79082
+[LightGBM] [Info] 124.065593 seconds elapsed, finished iteration 62
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 16
+[LightGBM] [Info] Iteration:63, valid_1 auc : 0.791003
+[LightGBM] [Info] 126.052096 seconds elapsed, finished iteration 63
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 25
+[LightGBM] [Info] Iteration:64, valid_1 auc : 0.791205
+[LightGBM] [Info] 128.050329 seconds elapsed, finished iteration 64
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 20
+[LightGBM] [Info] Iteration:65, valid_1 auc : 0.791334
+[LightGBM] [Info] 129.905296 seconds elapsed, finished iteration 65
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 16
+[LightGBM] [Info] Iteration:66, valid_1 auc : 0.791475
+[LightGBM] [Info] 132.154325 seconds elapsed, finished iteration 66
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 23
+[LightGBM] [Info] Iteration:67, valid_1 auc : 0.791588
+[LightGBM] [Info] 134.241501 seconds elapsed, finished iteration 67
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 19
+[LightGBM] [Info] Iteration:68, valid_1 auc : 0.791721
+[LightGBM] [Info] 136.439350 seconds elapsed, finished iteration 68
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 21
+[LightGBM] [Info] Iteration:69, valid_1 auc : 0.791857
+[LightGBM] [Info] 138.482214 seconds elapsed, finished iteration 69
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 26
+[LightGBM] [Info] Iteration:70, valid_1 auc : 0.79197
+[LightGBM] [Info] 140.400472 seconds elapsed, finished iteration 70
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 17
+[LightGBM] [Info] Iteration:71, valid_1 auc : 0.792111
+[LightGBM] [Info] 142.228681 seconds elapsed, finished iteration 71
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 25
+[LightGBM] [Info] Iteration:72, valid_1 auc : 0.792274
+[LightGBM] [Info] 144.393604 seconds elapsed, finished iteration 72
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 26
+[LightGBM] [Info] Iteration:73, valid_1 auc : 0.7924
+[LightGBM] [Info] 146.292180 seconds elapsed, finished iteration 73
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 23
+[LightGBM] [Info] Iteration:74, valid_1 auc : 0.792539
+[LightGBM] [Info] 148.169771 seconds elapsed, finished iteration 74
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 19
+[LightGBM] [Info] Iteration:75, valid_1 auc : 0.792639
+[LightGBM] [Info] 150.165081 seconds elapsed, finished iteration 75
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 21
+[LightGBM] [Info] Iteration:76, valid_1 auc : 0.792741
+[LightGBM] [Info] 152.057291 seconds elapsed, finished iteration 76
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 22
+[LightGBM] [Info] Iteration:77, valid_1 auc : 0.792839
+[LightGBM] [Info] 153.925999 seconds elapsed, finished iteration 77
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 24
+[LightGBM] [Info] Iteration:78, valid_1 auc : 0.792939
+[LightGBM] [Info] 155.895741 seconds elapsed, finished iteration 78
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 23
+[LightGBM] [Info] Iteration:79, valid_1 auc : 0.793046
+[LightGBM] [Info] 157.768287 seconds elapsed, finished iteration 79
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 22
+[LightGBM] [Info] Iteration:80, valid_1 auc : 0.793116
+[LightGBM] [Info] 159.549761 seconds elapsed, finished iteration 80
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 23
+[LightGBM] [Info] Iteration:81, valid_1 auc : 0.793236
+[LightGBM] [Info] 161.370647 seconds elapsed, finished iteration 81
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 21
+[LightGBM] [Info] Iteration:82, valid_1 auc : 0.793346
+[LightGBM] [Info] 163.155770 seconds elapsed, finished iteration 82
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 21
+[LightGBM] [Info] Iteration:83, valid_1 auc : 0.79344
+[LightGBM] [Info] 164.979900 seconds elapsed, finished iteration 83
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 18
+[LightGBM] [Info] Iteration:84, valid_1 auc : 0.793533
+[LightGBM] [Info] 167.160144 seconds elapsed, finished iteration 84
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 22
+[LightGBM] [Info] Iteration:85, valid_1 auc : 0.793659
+[LightGBM] [Info] 169.128611 seconds elapsed, finished iteration 85
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 18
+[LightGBM] [Info] Iteration:86, valid_1 auc : 0.793756
+[LightGBM] [Info] 171.260280 seconds elapsed, finished iteration 86
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 27
+[LightGBM] [Info] Iteration:87, valid_1 auc : 0.793896
+[LightGBM] [Info] 172.950365 seconds elapsed, finished iteration 87
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 19
+[LightGBM] [Info] Iteration:88, valid_1 auc : 0.793971
+[LightGBM] [Info] 174.803021 seconds elapsed, finished iteration 88
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 19
+[LightGBM] [Info] Iteration:89, valid_1 auc : 0.794077
+[LightGBM] [Info] 176.518317 seconds elapsed, finished iteration 89
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 19
+[LightGBM] [Info] Iteration:90, valid_1 auc : 0.79415
+[LightGBM] [Info] 178.478767 seconds elapsed, finished iteration 90
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 18
+[LightGBM] [Info] Iteration:91, valid_1 auc : 0.794226
+[LightGBM] [Info] 180.518286 seconds elapsed, finished iteration 91
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 21
+[LightGBM] [Info] Iteration:92, valid_1 auc : 0.794311
+[LightGBM] [Info] 182.422732 seconds elapsed, finished iteration 92
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 22
+[LightGBM] [Info] Iteration:93, valid_1 auc : 0.794372
+[LightGBM] [Info] 184.376876 seconds elapsed, finished iteration 93
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 28
+[LightGBM] [Info] Iteration:94, valid_1 auc : 0.794455
+[LightGBM] [Info] 186.152621 seconds elapsed, finished iteration 94
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 24
+[LightGBM] [Info] Iteration:95, valid_1 auc : 0.794527
+[LightGBM] [Info] 188.133251 seconds elapsed, finished iteration 95
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 24
+[LightGBM] [Info] Iteration:96, valid_1 auc : 0.79464
+[LightGBM] [Info] 190.028049 seconds elapsed, finished iteration 96
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 27
+[LightGBM] [Info] Iteration:97, valid_1 auc : 0.794742
+[LightGBM] [Info] 191.945429 seconds elapsed, finished iteration 97
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 25
+[LightGBM] [Info] Iteration:98, valid_1 auc : 0.794827
+[LightGBM] [Info] 193.840235 seconds elapsed, finished iteration 98
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 20
+[LightGBM] [Info] Iteration:99, valid_1 auc : 0.794905
+[LightGBM] [Info] 195.690898 seconds elapsed, finished iteration 99
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 27
+[LightGBM] [Info] Iteration:100, valid_1 auc : 0.795023
+[LightGBM] [Info] 197.623062 seconds elapsed, finished iteration 100
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 25
+[LightGBM] [Info] Iteration:101, valid_1 auc : 0.795095
+[LightGBM] [Info] 199.414324 seconds elapsed, finished iteration 101
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 26
+[LightGBM] [Info] Iteration:102, valid_1 auc : 0.795146
+[LightGBM] [Info] 201.353395 seconds elapsed, finished iteration 102
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 21
+[LightGBM] [Info] Iteration:103, valid_1 auc : 0.795204
+[LightGBM] [Info] 203.243879 seconds elapsed, finished iteration 103
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 24
+[LightGBM] [Info] Iteration:104, valid_1 auc : 0.795268
+[LightGBM] [Info] 205.797048 seconds elapsed, finished iteration 104
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 24
+[LightGBM] [Info] Iteration:105, valid_1 auc : 0.795338
+[LightGBM] [Info] 209.329644 seconds elapsed, finished iteration 105
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 32
+[LightGBM] [Info] Iteration:106, valid_1 auc : 0.795387
+[LightGBM] [Info] 212.237468 seconds elapsed, finished iteration 106
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 25
+[LightGBM] [Info] Iteration:107, valid_1 auc : 0.795449
+[LightGBM] [Info] 214.120211 seconds elapsed, finished iteration 107
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 20
+[LightGBM] [Info] Iteration:108, valid_1 auc : 0.795515
+[LightGBM] [Info] 216.091882 seconds elapsed, finished iteration 108
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 33
+[LightGBM] [Info] Iteration:109, valid_1 auc : 0.795573
+[LightGBM] [Info] 218.061843 seconds elapsed, finished iteration 109
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 25
+[LightGBM] [Info] Iteration:110, valid_1 auc : 0.795667
+[LightGBM] [Info] 220.696400 seconds elapsed, finished iteration 110
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 26
+[LightGBM] [Info] Iteration:111, valid_1 auc : 0.795746
+[LightGBM] [Info] 223.183641 seconds elapsed, finished iteration 111
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 28
+[LightGBM] [Info] Iteration:112, valid_1 auc : 0.795807
+[LightGBM] [Info] 226.984986 seconds elapsed, finished iteration 112
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 20
+[LightGBM] [Info] Iteration:113, valid_1 auc : 0.795869
+[LightGBM] [Info] 228.794735 seconds elapsed, finished iteration 113
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 24
+[LightGBM] [Info] Iteration:114, valid_1 auc : 0.795925
+[LightGBM] [Info] 230.791228 seconds elapsed, finished iteration 114
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 25
+[LightGBM] [Info] Iteration:115, valid_1 auc : 0.796003
+[LightGBM] [Info] 232.814419 seconds elapsed, finished iteration 115
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 21
+[LightGBM] [Info] Iteration:116, valid_1 auc : 0.796084
+[LightGBM] [Info] 234.836969 seconds elapsed, finished iteration 116
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 22
+[LightGBM] [Info] Iteration:117, valid_1 auc : 0.796139
+[LightGBM] [Info] 236.635778 seconds elapsed, finished iteration 117
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 24
+[LightGBM] [Info] Iteration:118, valid_1 auc : 0.796225
+[LightGBM] [Info] 238.623046 seconds elapsed, finished iteration 118
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 20
+[LightGBM] [Info] Iteration:119, valid_1 auc : 0.79628
+[LightGBM] [Info] 240.752966 seconds elapsed, finished iteration 119
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 21
+[LightGBM] [Info] Iteration:120, valid_1 auc : 0.796332
+[LightGBM] [Info] 242.732773 seconds elapsed, finished iteration 120
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 24
+[LightGBM] [Info] Iteration:121, valid_1 auc : 0.796377
+[LightGBM] [Info] 244.793573 seconds elapsed, finished iteration 121
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 34
+[LightGBM] [Info] Iteration:122, valid_1 auc : 0.796442
+[LightGBM] [Info] 246.821789 seconds elapsed, finished iteration 122
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 28
+[LightGBM] [Info] Iteration:123, valid_1 auc : 0.796493
+[LightGBM] [Info] 248.795958 seconds elapsed, finished iteration 123
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 21
+[LightGBM] [Info] Iteration:124, valid_1 auc : 0.796538
+[LightGBM] [Info] 250.809531 seconds elapsed, finished iteration 124
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 24
+[LightGBM] [Info] Iteration:125, valid_1 auc : 0.796586
+[LightGBM] [Info] 252.809806 seconds elapsed, finished iteration 125
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 22
+[LightGBM] [Info] Iteration:126, valid_1 auc : 0.796676
+[LightGBM] [Info] 254.622912 seconds elapsed, finished iteration 126
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 23
+[LightGBM] [Info] Iteration:127, valid_1 auc : 0.796738
+[LightGBM] [Info] 256.490070 seconds elapsed, finished iteration 127
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 29
+[LightGBM] [Info] Iteration:128, valid_1 auc : 0.796751
+[LightGBM] [Info] 258.533052 seconds elapsed, finished iteration 128
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 25
+[LightGBM] [Info] Iteration:129, valid_1 auc : 0.796804
+[LightGBM] [Info] 260.395480 seconds elapsed, finished iteration 129
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 18
+[LightGBM] [Info] Iteration:130, valid_1 auc : 0.796853
+[LightGBM] [Info] 262.186641 seconds elapsed, finished iteration 130
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 25
+[LightGBM] [Info] Iteration:131, valid_1 auc : 0.7969
+[LightGBM] [Info] 264.042009 seconds elapsed, finished iteration 131
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 24
+[LightGBM] [Info] Iteration:132, valid_1 auc : 0.79695
+[LightGBM] [Info] 265.833131 seconds elapsed, finished iteration 132
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 19
+[LightGBM] [Info] Iteration:133, valid_1 auc : 0.796988
+[LightGBM] [Info] 267.690796 seconds elapsed, finished iteration 133
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 24
+[LightGBM] [Info] Iteration:134, valid_1 auc : 0.797046
+[LightGBM] [Info] 269.409008 seconds elapsed, finished iteration 134
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 19
+[LightGBM] [Info] Iteration:135, valid_1 auc : 0.797087
+[LightGBM] [Info] 271.189617 seconds elapsed, finished iteration 135
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 34
+[LightGBM] [Info] Iteration:136, valid_1 auc : 0.79714
+[LightGBM] [Info] 273.042907 seconds elapsed, finished iteration 136
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 25
+[LightGBM] [Info] Iteration:137, valid_1 auc : 0.797178
+[LightGBM] [Info] 274.743848 seconds elapsed, finished iteration 137
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 33
+[LightGBM] [Info] Iteration:138, valid_1 auc : 0.79723
+[LightGBM] [Info] 277.467679 seconds elapsed, finished iteration 138
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 27
+[LightGBM] [Info] Iteration:139, valid_1 auc : 0.797275
+[LightGBM] [Info] 279.379102 seconds elapsed, finished iteration 139
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 30
+[LightGBM] [Info] Iteration:140, valid_1 auc : 0.797326
+[LightGBM] [Info] 281.088942 seconds elapsed, finished iteration 140
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 27
+[LightGBM] [Info] Iteration:141, valid_1 auc : 0.797377
+[LightGBM] [Info] 282.915009 seconds elapsed, finished iteration 141
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 22
+[LightGBM] [Info] Iteration:142, valid_1 auc : 0.797437
+[LightGBM] [Info] 284.632612 seconds elapsed, finished iteration 142
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 21
+[LightGBM] [Info] Iteration:143, valid_1 auc : 0.797488
+[LightGBM] [Info] 286.590418 seconds elapsed, finished iteration 143
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 27
+[LightGBM] [Info] Iteration:144, valid_1 auc : 0.797538
+[LightGBM] [Info] 288.422269 seconds elapsed, finished iteration 144
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 23
+[LightGBM] [Info] Iteration:145, valid_1 auc : 0.79759
+[LightGBM] [Info] 290.299269 seconds elapsed, finished iteration 145
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 39
+[LightGBM] [Info] Iteration:146, valid_1 auc : 0.797645
+[LightGBM] [Info] 292.960273 seconds elapsed, finished iteration 146
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 24
+[LightGBM] [Info] Iteration:147, valid_1 auc : 0.797702
+[LightGBM] [Info] 294.817567 seconds elapsed, finished iteration 147
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 27
+[LightGBM] [Info] Iteration:148, valid_1 auc : 0.797735
+[LightGBM] [Info] 296.690757 seconds elapsed, finished iteration 148
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 26
+[LightGBM] [Info] Iteration:149, valid_1 auc : 0.797779
+[LightGBM] [Info] 298.593282 seconds elapsed, finished iteration 149
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 24
+[LightGBM] [Info] Iteration:150, valid_1 auc : 0.797837
+[LightGBM] [Info] 300.460035 seconds elapsed, finished iteration 150
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 24
+[LightGBM] [Info] Iteration:151, valid_1 auc : 0.797878
+[LightGBM] [Info] 302.278670 seconds elapsed, finished iteration 151
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 34
+[LightGBM] [Info] Iteration:152, valid_1 auc : 0.797937
+[LightGBM] [Info] 304.277248 seconds elapsed, finished iteration 152
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 34
+[LightGBM] [Info] Iteration:153, valid_1 auc : 0.797986
+[LightGBM] [Info] 306.193034 seconds elapsed, finished iteration 153
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 20
+[LightGBM] [Info] Iteration:154, valid_1 auc : 0.798024
+[LightGBM] [Info] 308.397140 seconds elapsed, finished iteration 154
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 30
+[LightGBM] [Info] Iteration:155, valid_1 auc : 0.798065
+[LightGBM] [Info] 310.590689 seconds elapsed, finished iteration 155
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 21
+[LightGBM] [Info] Iteration:156, valid_1 auc : 0.798094
+[LightGBM] [Info] 312.669767 seconds elapsed, finished iteration 156
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 22
+[LightGBM] [Info] Iteration:157, valid_1 auc : 0.798127
+[LightGBM] [Info] 314.483343 seconds elapsed, finished iteration 157
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 25
+[LightGBM] [Info] Iteration:158, valid_1 auc : 0.798162
+[LightGBM] [Info] 316.379794 seconds elapsed, finished iteration 158
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 25
+[LightGBM] [Info] Iteration:159, valid_1 auc : 0.798209
+[LightGBM] [Info] 318.230803 seconds elapsed, finished iteration 159
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 30
+[LightGBM] [Info] Iteration:160, valid_1 auc : 0.798254
+[LightGBM] [Info] 320.127118 seconds elapsed, finished iteration 160
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 21
+[LightGBM] [Info] Iteration:161, valid_1 auc : 0.798291
+[LightGBM] [Info] 321.886844 seconds elapsed, finished iteration 161
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 22
+[LightGBM] [Info] Iteration:162, valid_1 auc : 0.798333
+[LightGBM] [Info] 323.640887 seconds elapsed, finished iteration 162
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 34
+[LightGBM] [Info] Iteration:163, valid_1 auc : 0.79839
+[LightGBM] [Info] 325.749781 seconds elapsed, finished iteration 163
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 20
+[LightGBM] [Info] Iteration:164, valid_1 auc : 0.798418
+[LightGBM] [Info] 327.974386 seconds elapsed, finished iteration 164
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 20
+[LightGBM] [Info] Iteration:165, valid_1 auc : 0.798448
+[LightGBM] [Info] 329.830486 seconds elapsed, finished iteration 165
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 23
+[LightGBM] [Info] Iteration:166, valid_1 auc : 0.798483
+[LightGBM] [Info] 332.092752 seconds elapsed, finished iteration 166
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 19
+[LightGBM] [Info] Iteration:167, valid_1 auc : 0.798533
+[LightGBM] [Info] 334.002576 seconds elapsed, finished iteration 167
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 25
+[LightGBM] [Info] Iteration:168, valid_1 auc : 0.798566
+[LightGBM] [Info] 336.013022 seconds elapsed, finished iteration 168
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 22
+[LightGBM] [Info] Iteration:169, valid_1 auc : 0.798593
+[LightGBM] [Info] 338.361097 seconds elapsed, finished iteration 169
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 21
+[LightGBM] [Info] Iteration:170, valid_1 auc : 0.798647
+[LightGBM] [Info] 340.233949 seconds elapsed, finished iteration 170
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 25
+[LightGBM] [Info] Iteration:171, valid_1 auc : 0.79868
+[LightGBM] [Info] 342.147953 seconds elapsed, finished iteration 171
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 30
+[LightGBM] [Info] Iteration:172, valid_1 auc : 0.798722
+[LightGBM] [Info] 343.960572 seconds elapsed, finished iteration 172
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 29
+[LightGBM] [Info] Iteration:173, valid_1 auc : 0.798756
+[LightGBM] [Info] 345.966345 seconds elapsed, finished iteration 173
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 19
+[LightGBM] [Info] Iteration:174, valid_1 auc : 0.798782
+[LightGBM] [Info] 347.761253 seconds elapsed, finished iteration 174
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 24
+[LightGBM] [Info] Iteration:175, valid_1 auc : 0.798806
+[LightGBM] [Info] 349.594353 seconds elapsed, finished iteration 175
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 33
+[LightGBM] [Info] Iteration:176, valid_1 auc : 0.798836
+[LightGBM] [Info] 351.377167 seconds elapsed, finished iteration 176
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 26
+[LightGBM] [Info] Iteration:177, valid_1 auc : 0.798876
+[LightGBM] [Info] 353.334771 seconds elapsed, finished iteration 177
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 21
+[LightGBM] [Info] Iteration:178, valid_1 auc : 0.79893
+[LightGBM] [Info] 355.297279 seconds elapsed, finished iteration 178
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 23
+[LightGBM] [Info] Iteration:179, valid_1 auc : 0.798953
+[LightGBM] [Info] 356.959149 seconds elapsed, finished iteration 179
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 27
+[LightGBM] [Info] Iteration:180, valid_1 auc : 0.79899
+[LightGBM] [Info] 358.769028 seconds elapsed, finished iteration 180
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 24
+[LightGBM] [Info] Iteration:181, valid_1 auc : 0.799031
+[LightGBM] [Info] 360.563141 seconds elapsed, finished iteration 181
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 19
+[LightGBM] [Info] Iteration:182, valid_1 auc : 0.799066
+[LightGBM] [Info] 362.262983 seconds elapsed, finished iteration 182
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 26
+[LightGBM] [Info] Iteration:183, valid_1 auc : 0.799097
+[LightGBM] [Info] 364.237285 seconds elapsed, finished iteration 183
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 37
+[LightGBM] [Info] Iteration:184, valid_1 auc : 0.799134
+[LightGBM] [Info] 366.112986 seconds elapsed, finished iteration 184
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 24
+[LightGBM] [Info] Iteration:185, valid_1 auc : 0.799165
+[LightGBM] [Info] 367.890069 seconds elapsed, finished iteration 185
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 24
+[LightGBM] [Info] Iteration:186, valid_1 auc : 0.799189
+[LightGBM] [Info] 369.792228 seconds elapsed, finished iteration 186
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 22
+[LightGBM] [Info] Iteration:187, valid_1 auc : 0.799215
+[LightGBM] [Info] 371.645440 seconds elapsed, finished iteration 187
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 23
+[LightGBM] [Info] Iteration:188, valid_1 auc : 0.799238
+[LightGBM] [Info] 373.547404 seconds elapsed, finished iteration 188
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 35
+[LightGBM] [Info] Iteration:189, valid_1 auc : 0.799265
+[LightGBM] [Info] 375.489490 seconds elapsed, finished iteration 189
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 20
+[LightGBM] [Info] Iteration:190, valid_1 auc : 0.799299
+[LightGBM] [Info] 377.324106 seconds elapsed, finished iteration 190
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 26
+[LightGBM] [Info] Iteration:191, valid_1 auc : 0.799328
+[LightGBM] [Info] 379.081950 seconds elapsed, finished iteration 191
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 25
+[LightGBM] [Info] Iteration:192, valid_1 auc : 0.799359
+[LightGBM] [Info] 380.827948 seconds elapsed, finished iteration 192
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 31
+[LightGBM] [Info] Iteration:193, valid_1 auc : 0.799382
+[LightGBM] [Info] 382.503425 seconds elapsed, finished iteration 193
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 22
+[LightGBM] [Info] Iteration:194, valid_1 auc : 0.799423
+[LightGBM] [Info] 384.275920 seconds elapsed, finished iteration 194
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 20
+[LightGBM] [Info] Iteration:195, valid_1 auc : 0.79944
+[LightGBM] [Info] 386.060789 seconds elapsed, finished iteration 195
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 21
+[LightGBM] [Info] Iteration:196, valid_1 auc : 0.799467
+[LightGBM] [Info] 387.697540 seconds elapsed, finished iteration 196
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 29
+[LightGBM] [Info] Iteration:197, valid_1 auc : 0.799505
+[LightGBM] [Info] 389.532021 seconds elapsed, finished iteration 197
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 25
+[LightGBM] [Info] Iteration:198, valid_1 auc : 0.799525
+[LightGBM] [Info] 391.436210 seconds elapsed, finished iteration 198
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 22
+[LightGBM] [Info] Iteration:199, valid_1 auc : 0.799546
+[LightGBM] [Info] 393.271242 seconds elapsed, finished iteration 199
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 29
+[LightGBM] [Info] Iteration:200, valid_1 auc : 0.799574
+[LightGBM] [Info] 395.007992 seconds elapsed, finished iteration 200
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 20
+[LightGBM] [Info] Iteration:201, valid_1 auc : 0.799608
+[LightGBM] [Info] 396.666118 seconds elapsed, finished iteration 201
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 22
+[LightGBM] [Info] Iteration:202, valid_1 auc : 0.799634
+[LightGBM] [Info] 398.504802 seconds elapsed, finished iteration 202
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 18
+[LightGBM] [Info] Iteration:203, valid_1 auc : 0.79967
+[LightGBM] [Info] 400.219446 seconds elapsed, finished iteration 203
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 24
+[LightGBM] [Info] Iteration:204, valid_1 auc : 0.799697
+[LightGBM] [Info] 401.935928 seconds elapsed, finished iteration 204
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 29
+[LightGBM] [Info] Iteration:205, valid_1 auc : 0.799723
+[LightGBM] [Info] 403.830654 seconds elapsed, finished iteration 205
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 19
+[LightGBM] [Info] Iteration:206, valid_1 auc : 0.799743
+[LightGBM] [Info] 405.549998 seconds elapsed, finished iteration 206
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 21
+[LightGBM] [Info] Iteration:207, valid_1 auc : 0.799762
+[LightGBM] [Info] 407.652435 seconds elapsed, finished iteration 207
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 28
+[LightGBM] [Info] Iteration:208, valid_1 auc : 0.799795
+[LightGBM] [Info] 409.499333 seconds elapsed, finished iteration 208
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 19
+[LightGBM] [Info] Iteration:209, valid_1 auc : 0.799815
+[LightGBM] [Info] 411.306821 seconds elapsed, finished iteration 209
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 18
+[LightGBM] [Info] Iteration:210, valid_1 auc : 0.799833
+[LightGBM] [Info] 412.887536 seconds elapsed, finished iteration 210
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 22
+[LightGBM] [Info] Iteration:211, valid_1 auc : 0.79985
+[LightGBM] [Info] 414.660429 seconds elapsed, finished iteration 211
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 17
+[LightGBM] [Info] Iteration:212, valid_1 auc : 0.799868
+[LightGBM] [Info] 416.594092 seconds elapsed, finished iteration 212
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 18
+[LightGBM] [Info] Iteration:213, valid_1 auc : 0.799889
+[LightGBM] [Info] 418.106798 seconds elapsed, finished iteration 213
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 20
+[LightGBM] [Info] Iteration:214, valid_1 auc : 0.799912
+[LightGBM] [Info] 419.747179 seconds elapsed, finished iteration 214
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 22
+[LightGBM] [Info] Iteration:215, valid_1 auc : 0.799922
+[LightGBM] [Info] 421.303295 seconds elapsed, finished iteration 215
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 21
+[LightGBM] [Info] Iteration:216, valid_1 auc : 0.799962
+[LightGBM] [Info] 422.759553 seconds elapsed, finished iteration 216
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 26
+[LightGBM] [Info] Iteration:217, valid_1 auc : 0.799983
+[LightGBM] [Info] 424.652171 seconds elapsed, finished iteration 217
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 20
+[LightGBM] [Info] Iteration:218, valid_1 auc : 0.799995
+[LightGBM] [Info] 426.533578 seconds elapsed, finished iteration 218
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 23
+[LightGBM] [Info] Iteration:219, valid_1 auc : 0.800008
+[LightGBM] [Info] 428.009004 seconds elapsed, finished iteration 219
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 22
+[LightGBM] [Info] Iteration:220, valid_1 auc : 0.800031
+[LightGBM] [Info] 429.645715 seconds elapsed, finished iteration 220
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 21
+[LightGBM] [Info] Iteration:221, valid_1 auc : 0.800064
+[LightGBM] [Info] 431.555037 seconds elapsed, finished iteration 221
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 29
+[LightGBM] [Info] Iteration:222, valid_1 auc : 0.800089
+[LightGBM] [Info] 433.167342 seconds elapsed, finished iteration 222
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 19
+[LightGBM] [Info] Iteration:223, valid_1 auc : 0.80011
+[LightGBM] [Info] 435.093948 seconds elapsed, finished iteration 223
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 26
+[LightGBM] [Info] Iteration:224, valid_1 auc : 0.800135
+[LightGBM] [Info] 436.750992 seconds elapsed, finished iteration 224
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 21
+[LightGBM] [Info] Iteration:225, valid_1 auc : 0.800159
+[LightGBM] [Info] 438.103917 seconds elapsed, finished iteration 225
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 23
+[LightGBM] [Info] Iteration:226, valid_1 auc : 0.800171
+[LightGBM] [Info] 439.797171 seconds elapsed, finished iteration 226
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 25
+[LightGBM] [Info] Iteration:227, valid_1 auc : 0.800186
+[LightGBM] [Info] 441.317092 seconds elapsed, finished iteration 227
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 22
+[LightGBM] [Info] Iteration:228, valid_1 auc : 0.800196
+[LightGBM] [Info] 442.723429 seconds elapsed, finished iteration 228
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 27
+[LightGBM] [Info] Iteration:229, valid_1 auc : 0.800211
+[LightGBM] [Info] 444.119411 seconds elapsed, finished iteration 229
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 22
+[LightGBM] [Info] Iteration:230, valid_1 auc : 0.800228
+[LightGBM] [Info] 446.002832 seconds elapsed, finished iteration 230
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 26
+[LightGBM] [Info] Iteration:231, valid_1 auc : 0.800235
+[LightGBM] [Info] 447.737499 seconds elapsed, finished iteration 231
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 22
+[LightGBM] [Info] Iteration:232, valid_1 auc : 0.800263
+[LightGBM] [Info] 449.304559 seconds elapsed, finished iteration 232
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 17
+[LightGBM] [Info] Iteration:233, valid_1 auc : 0.800282
+[LightGBM] [Info] 451.109803 seconds elapsed, finished iteration 233
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 24
+[LightGBM] [Info] Iteration:234, valid_1 auc : 0.80033
+[LightGBM] [Info] 452.845365 seconds elapsed, finished iteration 234
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 23
+[LightGBM] [Info] Iteration:235, valid_1 auc : 0.800347
+[LightGBM] [Info] 454.550651 seconds elapsed, finished iteration 235
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 25
+[LightGBM] [Info] Iteration:236, valid_1 auc : 0.800368
+[LightGBM] [Info] 456.392163 seconds elapsed, finished iteration 236
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 24
+[LightGBM] [Info] Iteration:237, valid_1 auc : 0.800389
+[LightGBM] [Info] 458.134362 seconds elapsed, finished iteration 237
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 29
+[LightGBM] [Info] Iteration:238, valid_1 auc : 0.80041
+[LightGBM] [Info] 459.753247 seconds elapsed, finished iteration 238
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 20
+[LightGBM] [Info] Iteration:239, valid_1 auc : 0.800422
+[LightGBM] [Info] 461.433303 seconds elapsed, finished iteration 239
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 18
+[LightGBM] [Info] Iteration:240, valid_1 auc : 0.800446
+[LightGBM] [Info] 463.312828 seconds elapsed, finished iteration 240
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 23
+[LightGBM] [Info] Iteration:241, valid_1 auc : 0.800476
+[LightGBM] [Info] 464.924581 seconds elapsed, finished iteration 241
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 18
+[LightGBM] [Info] Iteration:242, valid_1 auc : 0.800507
+[LightGBM] [Info] 466.958231 seconds elapsed, finished iteration 242
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 27
+[LightGBM] [Info] Iteration:243, valid_1 auc : 0.800525
+[LightGBM] [Info] 468.825779 seconds elapsed, finished iteration 243
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 26
+[LightGBM] [Info] Iteration:244, valid_1 auc : 0.800545
+[LightGBM] [Info] 470.636744 seconds elapsed, finished iteration 244
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 21
+[LightGBM] [Info] Iteration:245, valid_1 auc : 0.800579
+[LightGBM] [Info] 472.340554 seconds elapsed, finished iteration 245
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 19
+[LightGBM] [Info] Iteration:246, valid_1 auc : 0.800594
+[LightGBM] [Info] 473.880413 seconds elapsed, finished iteration 246
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 20
+[LightGBM] [Info] Iteration:247, valid_1 auc : 0.800601
+[LightGBM] [Info] 475.288044 seconds elapsed, finished iteration 247
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 27
+[LightGBM] [Info] Iteration:248, valid_1 auc : 0.800617
+[LightGBM] [Info] 476.794562 seconds elapsed, finished iteration 248
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 22
+[LightGBM] [Info] Iteration:249, valid_1 auc : 0.800628
+[LightGBM] [Info] 478.388178 seconds elapsed, finished iteration 249
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 24
+[LightGBM] [Info] Iteration:250, valid_1 auc : 0.80064
+[LightGBM] [Info] 479.954886 seconds elapsed, finished iteration 250
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 26
+[LightGBM] [Info] Iteration:251, valid_1 auc : 0.800646
+[LightGBM] [Info] 481.470631 seconds elapsed, finished iteration 251
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 21
+[LightGBM] [Info] Iteration:252, valid_1 auc : 0.800655
+[LightGBM] [Info] 483.040058 seconds elapsed, finished iteration 252
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 21
+[LightGBM] [Info] Iteration:253, valid_1 auc : 0.800668
+[LightGBM] [Info] 484.633776 seconds elapsed, finished iteration 253
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 24
+[LightGBM] [Info] Iteration:254, valid_1 auc : 0.800698
+[LightGBM] [Info] 486.417523 seconds elapsed, finished iteration 254
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 24
+[LightGBM] [Info] Iteration:255, valid_1 auc : 0.800721
+[LightGBM] [Info] 488.416008 seconds elapsed, finished iteration 255
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 22
+[LightGBM] [Info] Iteration:256, valid_1 auc : 0.800728
+[LightGBM] [Info] 490.025789 seconds elapsed, finished iteration 256
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 23
+[LightGBM] [Info] Iteration:257, valid_1 auc : 0.800734
+[LightGBM] [Info] 491.396789 seconds elapsed, finished iteration 257
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 21
+[LightGBM] [Info] Iteration:258, valid_1 auc : 0.800739
+[LightGBM] [Info] 493.019574 seconds elapsed, finished iteration 258
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 21
+[LightGBM] [Info] Iteration:259, valid_1 auc : 0.800773
+[LightGBM] [Info] 494.757952 seconds elapsed, finished iteration 259
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 24
+[LightGBM] [Info] Iteration:260, valid_1 auc : 0.800801
+[LightGBM] [Info] 496.750263 seconds elapsed, finished iteration 260
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 20
+[LightGBM] [Info] Iteration:261, valid_1 auc : 0.800821
+[LightGBM] [Info] 498.260248 seconds elapsed, finished iteration 261
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 20
+[LightGBM] [Info] Iteration:262, valid_1 auc : 0.80084
+[LightGBM] [Info] 499.921009 seconds elapsed, finished iteration 262
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 20
+[LightGBM] [Info] Iteration:263, valid_1 auc : 0.800852
+[LightGBM] [Info] 501.374271 seconds elapsed, finished iteration 263
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 27
+[LightGBM] [Info] Iteration:264, valid_1 auc : 0.800857
+[LightGBM] [Info] 502.786413 seconds elapsed, finished iteration 264
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 17
+[LightGBM] [Info] Iteration:265, valid_1 auc : 0.800885
+[LightGBM] [Info] 504.297192 seconds elapsed, finished iteration 265
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 21
+[LightGBM] [Info] Iteration:266, valid_1 auc : 0.800889
+[LightGBM] [Info] 506.211656 seconds elapsed, finished iteration 266
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 17
+[LightGBM] [Info] Iteration:267, valid_1 auc : 0.800906
+[LightGBM] [Info] 508.931026 seconds elapsed, finished iteration 267
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 22
+[LightGBM] [Info] Iteration:268, valid_1 auc : 0.800923
+[LightGBM] [Info] 511.260913 seconds elapsed, finished iteration 268
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 19
+[LightGBM] [Info] Iteration:269, valid_1 auc : 0.800942
+[LightGBM] [Info] 513.604572 seconds elapsed, finished iteration 269
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 23
+[LightGBM] [Info] Iteration:270, valid_1 auc : 0.800964
+[LightGBM] [Info] 515.786259 seconds elapsed, finished iteration 270
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 20
+[LightGBM] [Info] Iteration:271, valid_1 auc : 0.800973
+[LightGBM] [Info] 517.357905 seconds elapsed, finished iteration 271
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 22
+[LightGBM] [Info] Iteration:272, valid_1 auc : 0.800979
+[LightGBM] [Info] 518.735643 seconds elapsed, finished iteration 272
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 29
+[LightGBM] [Info] Iteration:273, valid_1 auc : 0.800999
+[LightGBM] [Info] 520.957950 seconds elapsed, finished iteration 273
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 21
+[LightGBM] [Info] Iteration:274, valid_1 auc : 0.801001
+[LightGBM] [Info] 523.068225 seconds elapsed, finished iteration 274
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 21
+[LightGBM] [Info] Iteration:275, valid_1 auc : 0.801005
+[LightGBM] [Info] 524.480830 seconds elapsed, finished iteration 275
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 22
+[LightGBM] [Info] Iteration:276, valid_1 auc : 0.801012
+[LightGBM] [Info] 526.949693 seconds elapsed, finished iteration 276
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 19
+[LightGBM] [Info] Iteration:277, valid_1 auc : 0.801039
+[LightGBM] [Info] 528.513141 seconds elapsed, finished iteration 277
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 15
+[LightGBM] [Info] Iteration:278, valid_1 auc : 0.801055
+[LightGBM] [Info] 530.378356 seconds elapsed, finished iteration 278
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 21
+[LightGBM] [Info] Iteration:279, valid_1 auc : 0.801057
+[LightGBM] [Info] 531.856833 seconds elapsed, finished iteration 279
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 19
+[LightGBM] [Info] Iteration:280, valid_1 auc : 0.801068
+[LightGBM] [Info] 533.532594 seconds elapsed, finished iteration 280
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 19
+[LightGBM] [Info] Iteration:281, valid_1 auc : 0.801072
+[LightGBM] [Info] 535.021923 seconds elapsed, finished iteration 281
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 23
+[LightGBM] [Info] Iteration:282, valid_1 auc : 0.801075
+[LightGBM] [Info] 536.584141 seconds elapsed, finished iteration 282
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 24
+[LightGBM] [Info] Iteration:283, valid_1 auc : 0.80108
+[LightGBM] [Info] 538.153621 seconds elapsed, finished iteration 283
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 18
+[LightGBM] [Info] Iteration:284, valid_1 auc : 0.801094
+[LightGBM] [Info] 539.906369 seconds elapsed, finished iteration 284
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 23
+[LightGBM] [Info] Iteration:285, valid_1 auc : 0.8011
+[LightGBM] [Info] 541.528407 seconds elapsed, finished iteration 285
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 23
+[LightGBM] [Info] Iteration:286, valid_1 auc : 0.801106
+[LightGBM] [Info] 542.987797 seconds elapsed, finished iteration 286
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 18
+[LightGBM] [Info] Iteration:287, valid_1 auc : 0.801123
+[LightGBM] [Info] 544.684221 seconds elapsed, finished iteration 287
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 19
+[LightGBM] [Info] Iteration:288, valid_1 auc : 0.801137
+[LightGBM] [Info] 546.291699 seconds elapsed, finished iteration 288
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 20
+[LightGBM] [Info] Iteration:289, valid_1 auc : 0.801143
+[LightGBM] [Info] 548.063747 seconds elapsed, finished iteration 289
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 20
+[LightGBM] [Info] Iteration:290, valid_1 auc : 0.801148
+[LightGBM] [Info] 549.580244 seconds elapsed, finished iteration 290
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 23
+[LightGBM] [Info] Iteration:291, valid_1 auc : 0.801157
+[LightGBM] [Info] 550.968275 seconds elapsed, finished iteration 291
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 22
+[LightGBM] [Info] Iteration:292, valid_1 auc : 0.80118
+[LightGBM] [Info] 552.508955 seconds elapsed, finished iteration 292
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 23
+[LightGBM] [Info] Iteration:293, valid_1 auc : 0.801201
+[LightGBM] [Info] 553.974730 seconds elapsed, finished iteration 293
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 25
+[LightGBM] [Info] Iteration:294, valid_1 auc : 0.801213
+[LightGBM] [Info] 555.603671 seconds elapsed, finished iteration 294
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 20
+[LightGBM] [Info] Iteration:295, valid_1 auc : 0.801217
+[LightGBM] [Info] 557.355523 seconds elapsed, finished iteration 295
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 19
+[LightGBM] [Info] Iteration:296, valid_1 auc : 0.801225
+[LightGBM] [Info] 558.639040 seconds elapsed, finished iteration 296
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 19
+[LightGBM] [Info] Iteration:297, valid_1 auc : 0.801234
+[LightGBM] [Info] 560.283758 seconds elapsed, finished iteration 297
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 18
+[LightGBM] [Info] Iteration:298, valid_1 auc : 0.801255
+[LightGBM] [Info] 561.853560 seconds elapsed, finished iteration 298
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 28
+[LightGBM] [Info] Iteration:299, valid_1 auc : 0.801264
+[LightGBM] [Info] 563.322483 seconds elapsed, finished iteration 299
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 31
+[LightGBM] [Info] Iteration:300, valid_1 auc : 0.801267
+[LightGBM] [Info] 564.768779 seconds elapsed, finished iteration 300
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 21
+[LightGBM] [Info] Iteration:301, valid_1 auc : 0.801271
+[LightGBM] [Info] 566.399331 seconds elapsed, finished iteration 301
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 22
+[LightGBM] [Info] Iteration:302, valid_1 auc : 0.801284
+[LightGBM] [Info] 568.007973 seconds elapsed, finished iteration 302
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 22
+[LightGBM] [Info] Iteration:303, valid_1 auc : 0.801297
+[LightGBM] [Info] 569.411819 seconds elapsed, finished iteration 303
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 24
+[LightGBM] [Info] Iteration:304, valid_1 auc : 0.801305
+[LightGBM] [Info] 571.211741 seconds elapsed, finished iteration 304
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 19
+[LightGBM] [Info] Iteration:305, valid_1 auc : 0.801311
+[LightGBM] [Info] 572.787377 seconds elapsed, finished iteration 305
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 20
+[LightGBM] [Info] Iteration:306, valid_1 auc : 0.801327
+[LightGBM] [Info] 574.361215 seconds elapsed, finished iteration 306
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 21
+[LightGBM] [Info] Iteration:307, valid_1 auc : 0.80133
+[LightGBM] [Info] 575.970962 seconds elapsed, finished iteration 307
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 24
+[LightGBM] [Info] Iteration:308, valid_1 auc : 0.801339
+[LightGBM] [Info] 578.142880 seconds elapsed, finished iteration 308
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 18
+[LightGBM] [Info] Iteration:309, valid_1 auc : 0.801341
+[LightGBM] [Info] 579.805607 seconds elapsed, finished iteration 309
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 20
+[LightGBM] [Info] Iteration:310, valid_1 auc : 0.801345
+[LightGBM] [Info] 581.164966 seconds elapsed, finished iteration 310
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 25
+[LightGBM] [Info] Iteration:311, valid_1 auc : 0.801347
+[LightGBM] [Info] 582.810748 seconds elapsed, finished iteration 311
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 21
+[LightGBM] [Info] Iteration:312, valid_1 auc : 0.801356
+[LightGBM] [Info] 584.381878 seconds elapsed, finished iteration 312
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 25
+[LightGBM] [Info] Iteration:313, valid_1 auc : 0.801364
+[LightGBM] [Info] 586.027170 seconds elapsed, finished iteration 313
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 17
+[LightGBM] [Info] Iteration:314, valid_1 auc : 0.801375
+[LightGBM] [Info] 587.866977 seconds elapsed, finished iteration 314
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 17
+[LightGBM] [Info] Iteration:315, valid_1 auc : 0.80138
+[LightGBM] [Info] 589.322722 seconds elapsed, finished iteration 315
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 20
+[LightGBM] [Info] Iteration:316, valid_1 auc : 0.801398
+[LightGBM] [Info] 591.196070 seconds elapsed, finished iteration 316
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 19
+[LightGBM] [Info] Iteration:317, valid_1 auc : 0.801425
+[LightGBM] [Info] 593.372126 seconds elapsed, finished iteration 317
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 19
+[LightGBM] [Info] Iteration:318, valid_1 auc : 0.801433
+[LightGBM] [Info] 594.775811 seconds elapsed, finished iteration 318
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 30
+[LightGBM] [Info] Iteration:319, valid_1 auc : 0.801437
+[LightGBM] [Info] 596.204792 seconds elapsed, finished iteration 319
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 18
+[LightGBM] [Info] Iteration:320, valid_1 auc : 0.801443
+[LightGBM] [Info] 597.736743 seconds elapsed, finished iteration 320
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 27
+[LightGBM] [Info] Iteration:321, valid_1 auc : 0.801445
+[LightGBM] [Info] 599.378032 seconds elapsed, finished iteration 321
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 20
+[LightGBM] [Info] Iteration:322, valid_1 auc : 0.801457
+[LightGBM] [Info] 601.178884 seconds elapsed, finished iteration 322
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 26
+[LightGBM] [Info] Iteration:323, valid_1 auc : 0.801458
+[LightGBM] [Info] 602.714435 seconds elapsed, finished iteration 323
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 24
+[LightGBM] [Info] Iteration:324, valid_1 auc : 0.801459
+[LightGBM] [Info] 604.104246 seconds elapsed, finished iteration 324
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 24
+[LightGBM] [Info] Iteration:325, valid_1 auc : 0.801501
+[LightGBM] [Info] 605.520793 seconds elapsed, finished iteration 325
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 30
+[LightGBM] [Info] Iteration:326, valid_1 auc : 0.801517
+[LightGBM] [Info] 606.939260 seconds elapsed, finished iteration 326
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 18
+[LightGBM] [Info] Iteration:327, valid_1 auc : 0.801534
+[LightGBM] [Info] 608.250237 seconds elapsed, finished iteration 327
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 21
+[LightGBM] [Info] Iteration:328, valid_1 auc : 0.801543
+[LightGBM] [Info] 609.932774 seconds elapsed, finished iteration 328
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 19
+[LightGBM] [Info] Iteration:329, valid_1 auc : 0.801553
+[LightGBM] [Info] 611.464851 seconds elapsed, finished iteration 329
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 18
+[LightGBM] [Info] Iteration:330, valid_1 auc : 0.801553
+[LightGBM] [Info] 612.973828 seconds elapsed, finished iteration 330
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 21
+[LightGBM] [Info] Iteration:331, valid_1 auc : 0.801567
+[LightGBM] [Info] 614.714228 seconds elapsed, finished iteration 331
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 23
+[LightGBM] [Info] Iteration:332, valid_1 auc : 0.801577
+[LightGBM] [Info] 616.649472 seconds elapsed, finished iteration 332
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 19
+[LightGBM] [Info] Iteration:333, valid_1 auc : 0.80158
+[LightGBM] [Info] 618.351947 seconds elapsed, finished iteration 333
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 22
+[LightGBM] [Info] Iteration:334, valid_1 auc : 0.801585
+[LightGBM] [Info] 619.879475 seconds elapsed, finished iteration 334
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 26
+[LightGBM] [Info] Iteration:335, valid_1 auc : 0.801587
+[LightGBM] [Info] 621.557656 seconds elapsed, finished iteration 335
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 21
+[LightGBM] [Info] Iteration:336, valid_1 auc : 0.801594
+[LightGBM] [Info] 623.179045 seconds elapsed, finished iteration 336
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 25
+[LightGBM] [Info] Iteration:337, valid_1 auc : 0.801612
+[LightGBM] [Info] 624.941068 seconds elapsed, finished iteration 337
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 26
+[LightGBM] [Info] Iteration:338, valid_1 auc : 0.801612
+[LightGBM] [Info] 626.483981 seconds elapsed, finished iteration 338
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 19
+[LightGBM] [Info] Iteration:339, valid_1 auc : 0.801621
+[LightGBM] [Info] 628.143454 seconds elapsed, finished iteration 339
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 19
+[LightGBM] [Info] Iteration:340, valid_1 auc : 0.801635
+[LightGBM] [Info] 629.671982 seconds elapsed, finished iteration 340
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 22
+[LightGBM] [Info] Iteration:341, valid_1 auc : 0.801638
+[LightGBM] [Info] 631.172567 seconds elapsed, finished iteration 341
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 17
+[LightGBM] [Info] Iteration:342, valid_1 auc : 0.801658
+[LightGBM] [Info] 632.959099 seconds elapsed, finished iteration 342
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 20
+[LightGBM] [Info] Iteration:343, valid_1 auc : 0.801663
+[LightGBM] [Info] 634.426940 seconds elapsed, finished iteration 343
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 24
+[LightGBM] [Info] Iteration:344, valid_1 auc : 0.801671
+[LightGBM] [Info] 636.005150 seconds elapsed, finished iteration 344
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 19
+[LightGBM] [Info] Iteration:345, valid_1 auc : 0.801685
+[LightGBM] [Info] 637.622656 seconds elapsed, finished iteration 345
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 24
+[LightGBM] [Info] Iteration:346, valid_1 auc : 0.801706
+[LightGBM] [Info] 639.300846 seconds elapsed, finished iteration 346
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 23
+[LightGBM] [Info] Iteration:347, valid_1 auc : 0.801708
+[LightGBM] [Info] 640.666970 seconds elapsed, finished iteration 347
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 26
+[LightGBM] [Info] Iteration:348, valid_1 auc : 0.801718
+[LightGBM] [Info] 642.064877 seconds elapsed, finished iteration 348
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 25
+[LightGBM] [Info] Iteration:349, valid_1 auc : 0.801732
+[LightGBM] [Info] 643.458854 seconds elapsed, finished iteration 349
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 23
+[LightGBM] [Info] Iteration:350, valid_1 auc : 0.80174
+[LightGBM] [Info] 644.866534 seconds elapsed, finished iteration 350
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 21
+[LightGBM] [Info] Iteration:351, valid_1 auc : 0.801748
+[LightGBM] [Info] 646.774939 seconds elapsed, finished iteration 351
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 23
+[LightGBM] [Info] Iteration:352, valid_1 auc : 0.801766
+[LightGBM] [Info] 648.328612 seconds elapsed, finished iteration 352
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 21
+[LightGBM] [Info] Iteration:353, valid_1 auc : 0.801776
+[LightGBM] [Info] 650.043497 seconds elapsed, finished iteration 353
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 29
+[LightGBM] [Info] Iteration:354, valid_1 auc : 0.801782
+[LightGBM] [Info] 651.633829 seconds elapsed, finished iteration 354
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 22
+[LightGBM] [Info] Iteration:355, valid_1 auc : 0.801805
+[LightGBM] [Info] 653.548876 seconds elapsed, finished iteration 355
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 19
+[LightGBM] [Info] Iteration:356, valid_1 auc : 0.801822
+[LightGBM] [Info] 655.330815 seconds elapsed, finished iteration 356
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 21
+[LightGBM] [Info] Iteration:357, valid_1 auc : 0.801825
+[LightGBM] [Info] 656.775348 seconds elapsed, finished iteration 357
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 22
+[LightGBM] [Info] Iteration:358, valid_1 auc : 0.801828
+[LightGBM] [Info] 658.105071 seconds elapsed, finished iteration 358
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 25
+[LightGBM] [Info] Iteration:359, valid_1 auc : 0.801829
+[LightGBM] [Info] 659.664804 seconds elapsed, finished iteration 359
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 23
+[LightGBM] [Info] Iteration:360, valid_1 auc : 0.801843
+[LightGBM] [Info] 661.455866 seconds elapsed, finished iteration 360
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 28
+[LightGBM] [Info] Iteration:361, valid_1 auc : 0.801844
+[LightGBM] [Info] 662.984382 seconds elapsed, finished iteration 361
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 22
+[LightGBM] [Info] Iteration:362, valid_1 auc : 0.801864
+[LightGBM] [Info] 664.611293 seconds elapsed, finished iteration 362
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 21
+[LightGBM] [Info] Iteration:363, valid_1 auc : 0.801876
+[LightGBM] [Info] 665.987109 seconds elapsed, finished iteration 363
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 28
+[LightGBM] [Info] Iteration:364, valid_1 auc : 0.801897
+[LightGBM] [Info] 667.754771 seconds elapsed, finished iteration 364
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 20
+[LightGBM] [Info] Iteration:365, valid_1 auc : 0.801907
+[LightGBM] [Info] 669.412675 seconds elapsed, finished iteration 365
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 19
+[LightGBM] [Info] Iteration:366, valid_1 auc : 0.801924
+[LightGBM] [Info] 670.999049 seconds elapsed, finished iteration 366
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 22
+[LightGBM] [Info] Iteration:367, valid_1 auc : 0.801944
+[LightGBM] [Info] 672.576625 seconds elapsed, finished iteration 367
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 20
+[LightGBM] [Info] Iteration:368, valid_1 auc : 0.801963
+[LightGBM] [Info] 674.133884 seconds elapsed, finished iteration 368
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 23
+[LightGBM] [Info] Iteration:369, valid_1 auc : 0.801968
+[LightGBM] [Info] 675.504764 seconds elapsed, finished iteration 369
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 21
+[LightGBM] [Info] Iteration:370, valid_1 auc : 0.801977
+[LightGBM] [Info] 676.998739 seconds elapsed, finished iteration 370
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 22
+[LightGBM] [Info] Iteration:371, valid_1 auc : 0.80198
+[LightGBM] [Info] 678.311015 seconds elapsed, finished iteration 371
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 19
+[LightGBM] [Info] Iteration:372, valid_1 auc : 0.801985
+[LightGBM] [Info] 679.917873 seconds elapsed, finished iteration 372
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 20
+[LightGBM] [Info] Iteration:373, valid_1 auc : 0.801994
+[LightGBM] [Info] 681.253879 seconds elapsed, finished iteration 373
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 21
+[LightGBM] [Info] Iteration:374, valid_1 auc : 0.802003
+[LightGBM] [Info] 682.797019 seconds elapsed, finished iteration 374
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 29
+[LightGBM] [Info] Iteration:375, valid_1 auc : 0.802015
+[LightGBM] [Info] 684.097482 seconds elapsed, finished iteration 375
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 18
+[LightGBM] [Info] Iteration:376, valid_1 auc : 0.802023
+[LightGBM] [Info] 685.634313 seconds elapsed, finished iteration 376
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 22
+[LightGBM] [Info] Iteration:377, valid_1 auc : 0.802028
+[LightGBM] [Info] 687.264377 seconds elapsed, finished iteration 377
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 19
+[LightGBM] [Info] Iteration:378, valid_1 auc : 0.802036
+[LightGBM] [Info] 688.825461 seconds elapsed, finished iteration 378
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 23
+[LightGBM] [Info] Iteration:379, valid_1 auc : 0.802034
+[LightGBM] [Info] 690.256264 seconds elapsed, finished iteration 379
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 28
+[LightGBM] [Info] Iteration:380, valid_1 auc : 0.802036
+[LightGBM] [Info] 691.665337 seconds elapsed, finished iteration 380
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 28
+[LightGBM] [Info] Iteration:381, valid_1 auc : 0.802035
+[LightGBM] [Info] 693.107329 seconds elapsed, finished iteration 381
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 18
+[LightGBM] [Info] Iteration:382, valid_1 auc : 0.802048
+[LightGBM] [Info] 694.713524 seconds elapsed, finished iteration 382
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 21
+[LightGBM] [Info] Iteration:383, valid_1 auc : 0.80205
+[LightGBM] [Info] 696.227591 seconds elapsed, finished iteration 383
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 22
+[LightGBM] [Info] Iteration:384, valid_1 auc : 0.802051
+[LightGBM] [Info] 697.538793 seconds elapsed, finished iteration 384
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 21
+[LightGBM] [Info] Iteration:385, valid_1 auc : 0.80206
+[LightGBM] [Info] 699.145501 seconds elapsed, finished iteration 385
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 25
+[LightGBM] [Info] Iteration:386, valid_1 auc : 0.802069
+[LightGBM] [Info] 700.862751 seconds elapsed, finished iteration 386
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 25
+[LightGBM] [Info] Iteration:387, valid_1 auc : 0.802071
+[LightGBM] [Info] 702.243980 seconds elapsed, finished iteration 387
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 25
+[LightGBM] [Info] Iteration:388, valid_1 auc : 0.802094
+[LightGBM] [Info] 703.766175 seconds elapsed, finished iteration 388
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 22
+[LightGBM] [Info] Iteration:389, valid_1 auc : 0.802093
+[LightGBM] [Info] 705.194219 seconds elapsed, finished iteration 389
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 21
+[LightGBM] [Info] Iteration:390, valid_1 auc : 0.802097
+[LightGBM] [Info] 706.701303 seconds elapsed, finished iteration 390
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 22
+[LightGBM] [Info] Iteration:391, valid_1 auc : 0.802102
+[LightGBM] [Info] 708.250523 seconds elapsed, finished iteration 391
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 22
+[LightGBM] [Info] Iteration:392, valid_1 auc : 0.802104
+[LightGBM] [Info] 709.686139 seconds elapsed, finished iteration 392
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 22
+[LightGBM] [Info] Iteration:393, valid_1 auc : 0.802108
+[LightGBM] [Info] 711.332190 seconds elapsed, finished iteration 393
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 21
+[LightGBM] [Info] Iteration:394, valid_1 auc : 0.802138
+[LightGBM] [Info] 712.770674 seconds elapsed, finished iteration 394
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 26
+[LightGBM] [Info] Iteration:395, valid_1 auc : 0.802144
+[LightGBM] [Info] 714.238235 seconds elapsed, finished iteration 395
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 19
+[LightGBM] [Info] Iteration:396, valid_1 auc : 0.802148
+[LightGBM] [Info] 715.685080 seconds elapsed, finished iteration 396
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 22
+[LightGBM] [Info] Iteration:397, valid_1 auc : 0.802165
+[LightGBM] [Info] 717.321544 seconds elapsed, finished iteration 397
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 24
+[LightGBM] [Info] Iteration:398, valid_1 auc : 0.802166
+[LightGBM] [Info] 718.795646 seconds elapsed, finished iteration 398
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 18
+[LightGBM] [Info] Iteration:399, valid_1 auc : 0.802176
+[LightGBM] [Info] 720.494786 seconds elapsed, finished iteration 399
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 27
+[LightGBM] [Info] Iteration:400, valid_1 auc : 0.802176
+[LightGBM] [Info] 721.849710 seconds elapsed, finished iteration 400
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 17
+[LightGBM] [Info] Iteration:401, valid_1 auc : 0.802187
+[LightGBM] [Info] 723.490616 seconds elapsed, finished iteration 401
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 19
+[LightGBM] [Info] Iteration:402, valid_1 auc : 0.802189
+[LightGBM] [Info] 724.842662 seconds elapsed, finished iteration 402
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 28
+[LightGBM] [Info] Iteration:403, valid_1 auc : 0.802198
+[LightGBM] [Info] 726.386842 seconds elapsed, finished iteration 403
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 22
+[LightGBM] [Info] Iteration:404, valid_1 auc : 0.802204
+[LightGBM] [Info] 728.093225 seconds elapsed, finished iteration 404
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 24
+[LightGBM] [Info] Iteration:405, valid_1 auc : 0.802225
+[LightGBM] [Info] 729.705744 seconds elapsed, finished iteration 405
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 24
+[LightGBM] [Info] Iteration:406, valid_1 auc : 0.802245
+[LightGBM] [Info] 731.510312 seconds elapsed, finished iteration 406
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 20
+[LightGBM] [Info] Iteration:407, valid_1 auc : 0.802263
+[LightGBM] [Info] 733.377456 seconds elapsed, finished iteration 407
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 20
+[LightGBM] [Info] Iteration:408, valid_1 auc : 0.802266
+[LightGBM] [Info] 734.730943 seconds elapsed, finished iteration 408
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 31
+[LightGBM] [Info] Iteration:409, valid_1 auc : 0.802287
+[LightGBM] [Info] 736.223782 seconds elapsed, finished iteration 409
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 20
+[LightGBM] [Info] Iteration:410, valid_1 auc : 0.80229
+[LightGBM] [Info] 737.730495 seconds elapsed, finished iteration 410
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 23
+[LightGBM] [Info] Iteration:411, valid_1 auc : 0.802293
+[LightGBM] [Info] 739.232463 seconds elapsed, finished iteration 411
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 26
+[LightGBM] [Info] Iteration:412, valid_1 auc : 0.802301
+[LightGBM] [Info] 740.762988 seconds elapsed, finished iteration 412
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 20
+[LightGBM] [Info] Iteration:413, valid_1 auc : 0.802303
+[LightGBM] [Info] 742.219630 seconds elapsed, finished iteration 413
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 17
+[LightGBM] [Info] Iteration:414, valid_1 auc : 0.802306
+[LightGBM] [Info] 743.440560 seconds elapsed, finished iteration 414
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 17
+[LightGBM] [Info] Iteration:415, valid_1 auc : 0.802325
+[LightGBM] [Info] 744.931359 seconds elapsed, finished iteration 415
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 27
+[LightGBM] [Info] Iteration:416, valid_1 auc : 0.802326
+[LightGBM] [Info] 746.275332 seconds elapsed, finished iteration 416
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 21
+[LightGBM] [Info] Iteration:417, valid_1 auc : 0.802325
+[LightGBM] [Info] 747.754123 seconds elapsed, finished iteration 417
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 17
+[LightGBM] [Info] Iteration:418, valid_1 auc : 0.802346
+[LightGBM] [Info] 749.334257 seconds elapsed, finished iteration 418
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 17
+[LightGBM] [Info] Iteration:419, valid_1 auc : 0.802355
+[LightGBM] [Info] 750.998253 seconds elapsed, finished iteration 419
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 24
+[LightGBM] [Info] Iteration:420, valid_1 auc : 0.802359
+[LightGBM] [Info] 752.323604 seconds elapsed, finished iteration 420
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 19
+[LightGBM] [Info] Iteration:421, valid_1 auc : 0.802363
+[LightGBM] [Info] 753.561038 seconds elapsed, finished iteration 421
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 23
+[LightGBM] [Info] Iteration:422, valid_1 auc : 0.802366
+[LightGBM] [Info] 755.249889 seconds elapsed, finished iteration 422
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 21
+[LightGBM] [Info] Iteration:423, valid_1 auc : 0.80237
+[LightGBM] [Info] 756.978939 seconds elapsed, finished iteration 423
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 21
+[LightGBM] [Info] Iteration:424, valid_1 auc : 0.802371
+[LightGBM] [Info] 758.493076 seconds elapsed, finished iteration 424
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 20
+[LightGBM] [Info] Iteration:425, valid_1 auc : 0.802374
+[LightGBM] [Info] 760.019768 seconds elapsed, finished iteration 425
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 22
+[LightGBM] [Info] Iteration:426, valid_1 auc : 0.802378
+[LightGBM] [Info] 761.609416 seconds elapsed, finished iteration 426
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 20
+[LightGBM] [Info] Iteration:427, valid_1 auc : 0.802381
+[LightGBM] [Info] 763.076259 seconds elapsed, finished iteration 427
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 28
+[LightGBM] [Info] Iteration:428, valid_1 auc : 0.802383
+[LightGBM] [Info] 764.337076 seconds elapsed, finished iteration 428
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 19
+[LightGBM] [Info] Iteration:429, valid_1 auc : 0.802388
+[LightGBM] [Info] 765.718495 seconds elapsed, finished iteration 429
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 19
+[LightGBM] [Info] Iteration:430, valid_1 auc : 0.802392
+[LightGBM] [Info] 767.150176 seconds elapsed, finished iteration 430
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 23
+[LightGBM] [Info] Iteration:431, valid_1 auc : 0.802396
+[LightGBM] [Info] 768.755004 seconds elapsed, finished iteration 431
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 27
+[LightGBM] [Info] Iteration:432, valid_1 auc : 0.802399
+[LightGBM] [Info] 770.141423 seconds elapsed, finished iteration 432
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 23
+[LightGBM] [Info] Iteration:433, valid_1 auc : 0.802402
+[LightGBM] [Info] 771.718662 seconds elapsed, finished iteration 433
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 26
+[LightGBM] [Info] Iteration:434, valid_1 auc : 0.802402
+[LightGBM] [Info] 773.150675 seconds elapsed, finished iteration 434
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 29
+[LightGBM] [Info] Iteration:435, valid_1 auc : 0.802403
+[LightGBM] [Info] 774.452073 seconds elapsed, finished iteration 435
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 19
+[LightGBM] [Info] Iteration:436, valid_1 auc : 0.802416
+[LightGBM] [Info] 775.979610 seconds elapsed, finished iteration 436
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 20
+[LightGBM] [Info] Iteration:437, valid_1 auc : 0.802424
+[LightGBM] [Info] 777.502358 seconds elapsed, finished iteration 437
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 24
+[LightGBM] [Info] Iteration:438, valid_1 auc : 0.802425
+[LightGBM] [Info] 778.964692 seconds elapsed, finished iteration 438
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 22
+[LightGBM] [Info] Iteration:439, valid_1 auc : 0.80244
+[LightGBM] [Info] 780.785799 seconds elapsed, finished iteration 439
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 29
+[LightGBM] [Info] Iteration:440, valid_1 auc : 0.802444
+[LightGBM] [Info] 782.251722 seconds elapsed, finished iteration 440
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 24
+[LightGBM] [Info] Iteration:441, valid_1 auc : 0.802444
+[LightGBM] [Info] 783.667380 seconds elapsed, finished iteration 441
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 16
+[LightGBM] [Info] Iteration:442, valid_1 auc : 0.802461
+[LightGBM] [Info] 785.415007 seconds elapsed, finished iteration 442
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 21
+[LightGBM] [Info] Iteration:443, valid_1 auc : 0.802476
+[LightGBM] [Info] 786.890066 seconds elapsed, finished iteration 443
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 24
+[LightGBM] [Info] Iteration:444, valid_1 auc : 0.802479
+[LightGBM] [Info] 788.260697 seconds elapsed, finished iteration 444
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 18
+[LightGBM] [Info] Iteration:445, valid_1 auc : 0.802479
+[LightGBM] [Info] 789.491458 seconds elapsed, finished iteration 445
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 19
+[LightGBM] [Info] Iteration:446, valid_1 auc : 0.802484
+[LightGBM] [Info] 790.943476 seconds elapsed, finished iteration 446
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 21
+[LightGBM] [Info] Iteration:447, valid_1 auc : 0.802493
+[LightGBM] [Info] 792.478184 seconds elapsed, finished iteration 447
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 17
+[LightGBM] [Info] Iteration:448, valid_1 auc : 0.802498
+[LightGBM] [Info] 793.954499 seconds elapsed, finished iteration 448
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 18
+[LightGBM] [Info] Iteration:449, valid_1 auc : 0.802508
+[LightGBM] [Info] 795.459221 seconds elapsed, finished iteration 449
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 19
+[LightGBM] [Info] Iteration:450, valid_1 auc : 0.802514
+[LightGBM] [Info] 797.201753 seconds elapsed, finished iteration 450
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 22
+[LightGBM] [Info] Iteration:451, valid_1 auc : 0.802517
+[LightGBM] [Info] 798.731672 seconds elapsed, finished iteration 451
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 25
+[LightGBM] [Info] Iteration:452, valid_1 auc : 0.802521
+[LightGBM] [Info] 800.158806 seconds elapsed, finished iteration 452
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 15
+[LightGBM] [Info] Iteration:453, valid_1 auc : 0.80253
+[LightGBM] [Info] 801.503386 seconds elapsed, finished iteration 453
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 17
+[LightGBM] [Info] Iteration:454, valid_1 auc : 0.802539
+[LightGBM] [Info] 803.105804 seconds elapsed, finished iteration 454
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 23
+[LightGBM] [Info] Iteration:455, valid_1 auc : 0.802551
+[LightGBM] [Info] 804.576149 seconds elapsed, finished iteration 455
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 16
+[LightGBM] [Info] Iteration:456, valid_1 auc : 0.802553
+[LightGBM] [Info] 805.961011 seconds elapsed, finished iteration 456
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 25
+[LightGBM] [Info] Iteration:457, valid_1 auc : 0.802553
+[LightGBM] [Info] 808.767383 seconds elapsed, finished iteration 457
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 24
+[LightGBM] [Info] Iteration:458, valid_1 auc : 0.80257
+[LightGBM] [Info] 811.153482 seconds elapsed, finished iteration 458
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 27
+[LightGBM] [Info] Iteration:459, valid_1 auc : 0.802581
+[LightGBM] [Info] 813.638176 seconds elapsed, finished iteration 459
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 22
+[LightGBM] [Info] Iteration:460, valid_1 auc : 0.80258
+[LightGBM] [Info] 815.065959 seconds elapsed, finished iteration 460
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 23
+[LightGBM] [Info] Iteration:461, valid_1 auc : 0.80259
+[LightGBM] [Info] 816.413980 seconds elapsed, finished iteration 461
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 19
+[LightGBM] [Info] Iteration:462, valid_1 auc : 0.802602
+[LightGBM] [Info] 818.151616 seconds elapsed, finished iteration 462
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 25
+[LightGBM] [Info] Iteration:463, valid_1 auc : 0.802605
+[LightGBM] [Info] 820.174878 seconds elapsed, finished iteration 463
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 22
+[LightGBM] [Info] Iteration:464, valid_1 auc : 0.80261
+[LightGBM] [Info] 822.339847 seconds elapsed, finished iteration 464
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 18
+[LightGBM] [Info] Iteration:465, valid_1 auc : 0.802617
+[LightGBM] [Info] 823.778444 seconds elapsed, finished iteration 465
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 22
+[LightGBM] [Info] Iteration:466, valid_1 auc : 0.802624
+[LightGBM] [Info] 826.743697 seconds elapsed, finished iteration 466
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 22
+[LightGBM] [Info] Iteration:467, valid_1 auc : 0.802626
+[LightGBM] [Info] 828.207906 seconds elapsed, finished iteration 467
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 23
+[LightGBM] [Info] Iteration:468, valid_1 auc : 0.802627
+[LightGBM] [Info] 829.636938 seconds elapsed, finished iteration 468
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 17
+[LightGBM] [Info] Iteration:469, valid_1 auc : 0.802632
+[LightGBM] [Info] 831.109322 seconds elapsed, finished iteration 469
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 22
+[LightGBM] [Info] Iteration:470, valid_1 auc : 0.802643
+[LightGBM] [Info] 832.687107 seconds elapsed, finished iteration 470
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 19
+[LightGBM] [Info] Iteration:471, valid_1 auc : 0.802646
+[LightGBM] [Info] 834.267539 seconds elapsed, finished iteration 471
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 20
+[LightGBM] [Info] Iteration:472, valid_1 auc : 0.802643
+[LightGBM] [Info] 835.677644 seconds elapsed, finished iteration 472
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 22
+[LightGBM] [Info] Iteration:473, valid_1 auc : 0.802645
+[LightGBM] [Info] 836.986359 seconds elapsed, finished iteration 473
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 19
+[LightGBM] [Info] Iteration:474, valid_1 auc : 0.802648
+[LightGBM] [Info] 838.357938 seconds elapsed, finished iteration 474
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 26
+[LightGBM] [Info] Iteration:475, valid_1 auc : 0.802649
+[LightGBM] [Info] 839.881921 seconds elapsed, finished iteration 475
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 20
+[LightGBM] [Info] Iteration:476, valid_1 auc : 0.80265
+[LightGBM] [Info] 841.210146 seconds elapsed, finished iteration 476
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 24
+[LightGBM] [Info] Iteration:477, valid_1 auc : 0.802651
+[LightGBM] [Info] 842.520386 seconds elapsed, finished iteration 477
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 27
+[LightGBM] [Info] Iteration:478, valid_1 auc : 0.802653
+[LightGBM] [Info] 843.897366 seconds elapsed, finished iteration 478
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 22
+[LightGBM] [Info] Iteration:479, valid_1 auc : 0.802657
+[LightGBM] [Info] 845.337258 seconds elapsed, finished iteration 479
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 20
+[LightGBM] [Info] Iteration:480, valid_1 auc : 0.802661
+[LightGBM] [Info] 846.791668 seconds elapsed, finished iteration 480
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 26
+[LightGBM] [Info] Iteration:481, valid_1 auc : 0.802664
+[LightGBM] [Info] 848.398205 seconds elapsed, finished iteration 481
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 22
+[LightGBM] [Info] Iteration:482, valid_1 auc : 0.802671
+[LightGBM] [Info] 849.823559 seconds elapsed, finished iteration 482
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 31
+[LightGBM] [Info] Iteration:483, valid_1 auc : 0.802671
+[LightGBM] [Info] 851.417061 seconds elapsed, finished iteration 483
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 26
+[LightGBM] [Info] Iteration:484, valid_1 auc : 0.802677
+[LightGBM] [Info] 852.781078 seconds elapsed, finished iteration 484
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 26
+[LightGBM] [Info] Iteration:485, valid_1 auc : 0.802678
+[LightGBM] [Info] 854.156991 seconds elapsed, finished iteration 485
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 22
+[LightGBM] [Info] Iteration:486, valid_1 auc : 0.80268
+[LightGBM] [Info] 855.483032 seconds elapsed, finished iteration 486
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 18
+[LightGBM] [Info] Iteration:487, valid_1 auc : 0.802687
+[LightGBM] [Info] 857.178835 seconds elapsed, finished iteration 487
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 21
+[LightGBM] [Info] Iteration:488, valid_1 auc : 0.802687
+[LightGBM] [Info] 858.497979 seconds elapsed, finished iteration 488
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 21
+[LightGBM] [Info] Iteration:489, valid_1 auc : 0.802687
+[LightGBM] [Info] 859.748776 seconds elapsed, finished iteration 489
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 25
+[LightGBM] [Info] Iteration:490, valid_1 auc : 0.802687
+[LightGBM] [Info] 861.173925 seconds elapsed, finished iteration 490
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 21
+[LightGBM] [Info] Iteration:491, valid_1 auc : 0.802688
+[LightGBM] [Info] 862.637027 seconds elapsed, finished iteration 491
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 24
+[LightGBM] [Info] Iteration:492, valid_1 auc : 0.802689
+[LightGBM] [Info] 863.918803 seconds elapsed, finished iteration 492
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 18
+[LightGBM] [Info] Iteration:493, valid_1 auc : 0.802705
+[LightGBM] [Info] 865.304192 seconds elapsed, finished iteration 493
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 23
+[LightGBM] [Info] Iteration:494, valid_1 auc : 0.802705
+[LightGBM] [Info] 866.677366 seconds elapsed, finished iteration 494
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 26
+[LightGBM] [Info] Iteration:495, valid_1 auc : 0.802706
+[LightGBM] [Info] 868.003145 seconds elapsed, finished iteration 495
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 24
+[LightGBM] [Info] Iteration:496, valid_1 auc : 0.802706
+[LightGBM] [Info] 869.385894 seconds elapsed, finished iteration 496
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 26
+[LightGBM] [Info] Iteration:497, valid_1 auc : 0.802706
+[LightGBM] [Info] 870.748213 seconds elapsed, finished iteration 497
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 17
+[LightGBM] [Info] Iteration:498, valid_1 auc : 0.802714
+[LightGBM] [Info] 872.183875 seconds elapsed, finished iteration 498
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 22
+[LightGBM] [Info] Iteration:499, valid_1 auc : 0.802723
+[LightGBM] [Info] 873.632053 seconds elapsed, finished iteration 499
+[LightGBM] [Debug] Trained a tree with leaves = 255 and depth = 26
+[LightGBM] [Info] Iteration:500, valid_1 auc : 0.802724
+[LightGBM] [Info] 875.157015 seconds elapsed, finished iteration 500
+[LightGBM] [Info] Finished training
+[LightGBM] [Info] Finished linking network in 579.571925 seconds
+[LightGBM] [Info] DataParallelTreeLearner::ReduceHistogram costs:	 255.128445
+[LightGBM] [Info] DataParallelTreeLearner::ReduceHistogram::Copy costs:	 1.075509
+[LightGBM] [Info] DataParallelTreeLearner::ReduceHistogram::ReduceScatter costs:	 253.858772
+[LightGBM] [Info] DataPartition::Split costs:	 15.801438
+[LightGBM] [Info] Dataset::ConstructHistogramsMultiVal costs:	 69.384260
+[LightGBM] [Info] Dataset::FastFeatureBundling costs:	 0.132174
+[LightGBM] [Info] Dataset::GetMultiBinFromAllFeatures costs:	 0.478464
+[LightGBM] [Info] Dataset::InitTrain costs:	 0.010592
+[LightGBM] [Info] Dataset::PushDataToMultiValBin costs:	 0.352273
+[LightGBM] [Info] Dataset::TestMultiThreadingMethod costs:	 0.478516
+[LightGBM] [Info] Dataset::sparse_bin_histogram costs:	 66.618353
+[LightGBM] [Info] Dataset::sparse_bin_histogram_merge costs:	 2.322016
+[LightGBM] [Info] Dataset::sparse_bin_histogram_move costs:	 0.066689
+[LightGBM] [Info] GBDT::Bagging costs:	 0.000816
+[LightGBM] [Info] GBDT::BoostFromAverage costs:	 0.246894
+[LightGBM] [Info] GBDT::Boosting costs:	 7.969888
+[LightGBM] [Info] GBDT::Train costs:	 875.157023
+[LightGBM] [Info] GBDT::TrainOneIter costs:	 709.275924
+[LightGBM] [Info] GBDT::UpdateScore costs:	 52.926876
+[LightGBM] [Info] Recv time costs:	 564.317957
+[LightGBM] [Info] ReduceScatterRecursiveHalving::reduce costs:	 9.605715
+[LightGBM] [Info] ScoreUpdater::AddScore costs:	 52.923079
+[LightGBM] [Info] Send time costs:	 14.002340
+[LightGBM] [Info] SerialTreeLearner::BeforeFindBestSplit costs:	 0.062476
+[LightGBM] [Info] SerialTreeLearner::BeforeTrain costs:	 1.044215
+[LightGBM] [Info] SerialTreeLearner::ConstructHistograms costs:	 69.577861
+[LightGBM] [Info] SerialTreeLearner::RenewIntGradTreeOutput costs:	 4.666843
+[LightGBM] [Info] SerialTreeLearner::SplitInner costs:	 16.352721
+[LightGBM] [Info] SerialTreeLearner::Train costs:	 648.101176
